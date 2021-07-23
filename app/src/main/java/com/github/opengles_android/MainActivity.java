@@ -1,14 +1,16 @@
 package com.github.opengles_android;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.opengl.GLSurfaceView;
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.view.View;
 
 import com.github.opengles_android.databinding.ActivityMainBinding;
+import com.github.opengles_android.examples.bitmap.BitmapActivity;
+import com.github.opengles_android.examples.triangle.TriangleActivity;
 
-public class MainActivity extends AppCompatActivity {
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -16,7 +18,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private ActivityMainBinding binding;
-    private GLRender mGLRender;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,15 +26,8 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Example of a call to a native method
-        TextView tv = binding.sampleText;
-        tv.setText(stringFromJNI());
-
-        GLSurfaceView glSurfaceView = binding.glSurfaceView;
-        glSurfaceView.setEGLContextClientVersion(3);
-
-        mGLRender = new GLRender(getApplicationContext());
-        glSurfaceView.setRenderer(mGLRender);
+        binding.buttonTriangle.setOnClickListener(this);
+        binding.buttonBitmap.setOnClickListener(this);
     }
 
     /**
@@ -41,4 +35,22 @@ public class MainActivity extends AppCompatActivity {
      * which is packaged with this application.
      */
     public native String stringFromJNI();
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.button_triangle:
+                goToActivity(TriangleActivity.class);
+                break;
+
+            case R.id.button_bitmap:
+                goToActivity(BitmapActivity.class);
+                break;
+        }
+    }
+
+    private void goToActivity(Class<?> cls) {
+        Intent intent = new Intent(MainActivity.this, cls);
+        startActivity(intent);
+    }
 }

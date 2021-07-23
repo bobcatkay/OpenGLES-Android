@@ -1,37 +1,42 @@
-package com.github.opengles_android;
+package com.github.opengles_android.examples.bitmap;
 
 import android.content.Context;
-import android.content.QuickViewConstants;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
-import android.renderscript.Matrix4f;
 import android.util.Log;
+import android.util.Size;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import com.github.opengles_android.common.Shader;
+import com.github.opengles_android.common.Utils;
+
 import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-class GLRender implements GLSurfaceView.Renderer {
-    private final static String TAG = "GLRender";
+public class BitmapRender implements GLSurfaceView.Renderer {
+    private final static String TAG = "BitmapRender";
 
     private final static int FLOAT_SIZE = Float.SIZE / Byte.SIZE;
     private int[] mVAO;
     private Context mContext;
     private Shader mQuadShader;
+    private int mScreenWidth;
+    private int mScrenHeight;
     private int mVertexCount;
 
-    public GLRender(Context context) {
+    public BitmapRender(Context context) {
         mContext = context;
+        Size screenSize = Utils.getScreenResolution(context);
+        mScreenWidth = screenSize.getWidth();
+        mScrenHeight = screenSize.getHeight();
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
         initVertex();
-        mQuadShader = new Shader(mContext, "quad.vert", "quad.frag");
+        mQuadShader = new Shader(mContext, "triangle.vert", "triangle.frag");
     }
 
     @Override
@@ -41,7 +46,7 @@ class GLRender implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 gl10) {
-        GLES30.glViewport(0, 0, 1080, 1920);
+        GLES30.glViewport(0, 0, mScreenWidth, mScrenHeight);
 
         GLES30.glClearColor(0f, 0f, 0f, 0f);
         GLES30.glClear(GLES20.GL_COLOR_BUFFER_BIT);
@@ -50,13 +55,13 @@ class GLRender implements GLSurfaceView.Renderer {
 //        Matrix4f matrix4f = new Matrix4f();
 //        mQuadShader.setMat4("uMatrix", matrix4f.getArray());
         GLES30.glBindVertexArray(mVAO[0]);
-        GLES30.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
+        GLES30.glDrawArrays(GLES20.GL_TRIANGLES, 0, mVertexCount);
     }
 
     private void initVertex() {
         Log.d(TAG, "initVertex: ");
 
-        float quadVertices[] = {
+        float vertices[] = {
                 // positions       // texCoords   //color
                 -1.0f,  1.0f, 0f,  0f, 1.0f,    1.0f, 0f, 0f,
                 -1.0f, -1.0f, 0f,  0f, 0f,      0f, 1.0f, 0f,
@@ -67,11 +72,8 @@ class GLRender implements GLSurfaceView.Renderer {
                 1.0f,  1.0f, 0f,  1.0f, 1.0f,   0f, 0f, 0f,
         };
 
-        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(quadVertices.length * FLOAT_SIZE);
-        byteBuffer.order(ByteOrder.nativeOrder());
-        FloatBuffer vertexBuffer = byteBuffer.asFloatBuffer();
-        vertexBuffer.put(quadVertices);
-        vertexBuffer.position(0);
+        FloatBuffer vertexBuffer = Utils.floatArrayToBuffer(vertices);
+        mVertexCount = 6;
 
         mVAO = new int[1];
         int[] vbo = new int[1];

@@ -1,21 +1,19 @@
-package com.github.opengles_android;
+package com.github.opengles_android.common;
 
 import android.content.Context;
-import android.opengl.GLES20;
 import android.opengl.GLES30;
-import android.renderscript.Matrix4f;
 import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
 
-class Shader {
+public class Shader {
     private final static String TAG = "Shader";
     private int mProgram;
     private Map<String, Object> mParamLocations = new HashMap<>();
 
     public Shader(Context context, String vertexFileName, String fragmentFileName) {
-        this(Utils.getFromAssets(context, vertexFileName), Utils.getFromAssets(context, fragmentFileName));
+        this(Utils.getStringFromAssets(context, vertexFileName), Utils.getStringFromAssets(context, fragmentFileName));
     }
 
     public Shader(String vertexCode, String fragCode) {
