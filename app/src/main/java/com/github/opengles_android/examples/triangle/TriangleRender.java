@@ -24,14 +24,14 @@ public class TriangleRender implements GLSurfaceView.Renderer {
     private Context mContext;
     private Shader mTriangleShader;
     private int mScreenWidth;
-    private int mScrenHeight;
+    private int mScreenHeight;
     private int mVertexCount;
 
     public TriangleRender(Context context) {
         mContext = context;
         Size screenSize = Utils.getScreenResolution(context);
         mScreenWidth = screenSize.getWidth();
-        mScrenHeight = screenSize.getHeight();
+        mScreenHeight = screenSize.getHeight();
     }
 
     @Override
@@ -47,7 +47,7 @@ public class TriangleRender implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 gl10) {
-        GLES30.glViewport(0, 0, mScreenWidth, mScrenHeight);
+        GLES30.glViewport(0, 0, mScreenWidth, mScreenHeight);
 
         GLES30.glClearColor(1f, 1f, 1f, 0f);
         GLES30.glClear(GLES20.GL_COLOR_BUFFER_BIT);
@@ -61,10 +61,10 @@ public class TriangleRender implements GLSurfaceView.Renderer {
         Log.d(TAG, "initVertex: ");
 
         float vertices[] = {
-                // positions       // texCoords   //color
-                0f,     0.5f, 0f,  0f, 1.0f,    1.0f, 0f, 0f,
-                -1.0f, -0.5f, 0f,  0f, 0f,      0f, 1.0f, 0f,
-                1.0f, -0.5f, 0f,  1.0f, 0f,     0f, 0f, 1.0f,
+                // positions       //color
+                0f,     0.5f, 0f,   1.0f, 0f, 0f,
+                -1.0f, -0.5f, 0f,   0f, 1.0f, 0f,
+                1.0f, -0.5f, 0f,    0f, 0f, 1.0f,
         };
 
         FloatBuffer vertexBuffer = Utils.floatArrayToBuffer(vertices);
@@ -81,10 +81,8 @@ public class TriangleRender implements GLSurfaceView.Renderer {
         GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, size, vertexBuffer, GLES20.GL_STATIC_DRAW);
 
         GLES30.glEnableVertexAttribArray(0);
-        GLES30.glVertexAttribPointer(0, 3, GLES30.GL_FLOAT, true, 8 * FLOAT_SIZE, 0);
+        GLES30.glVertexAttribPointer(0, 3, GLES30.GL_FLOAT, true, 6 * FLOAT_SIZE, 0);
         GLES30.glEnableVertexAttribArray(1);
-        GLES30.glVertexAttribPointer(1, 2, GLES30.GL_FLOAT, true, 8 * FLOAT_SIZE, 3 * FLOAT_SIZE);
-        GLES30.glEnableVertexAttribArray(2);
-        GLES30.glVertexAttribPointer(2, 3, GLES30.GL_FLOAT, true, 8 * FLOAT_SIZE, 5 * FLOAT_SIZE);
+        GLES30.glVertexAttribPointer(1, 3, GLES30.GL_FLOAT, true, 6 * FLOAT_SIZE, 3 * FLOAT_SIZE);
     }
 }

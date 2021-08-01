@@ -1,8 +1,10 @@
 package com.github.opengles_android.common;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Point;
+import android.opengl.GLES30;
 import android.provider.Settings;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Size;
 import android.view.WindowManager;
@@ -47,16 +49,36 @@ public class Utils {
         return floatBuffer;
     }
 
+    public static FloatBuffer bitmapToBuffer(Bitmap bitmap) {
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * bitmap.getWidth() * bitmap.getHeight());
+        byteBuffer.order(ByteOrder.nativeOrder());
+        bitmap.copyPixelsToBuffer(byteBuffer);
+        return byteBuffer.asFloatBuffer();
+    }
+
     public static Size getScreenResolution(Context context) {
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics metrics = new DisplayMetrics();
-        wm.getDefaultDisplay().getRealMetrics(metrics);
-        int width = metrics.widthPixels;
-        int height = metrics.heightPixels;
+        Point point = new Point();
+        wm.getDefaultDisplay().getRealSize(point);
 
-        Log.d(TAG, "getScreenResolution, width: " + width + ", height: " + height);
+        Log.d(TAG, "getScreenResolution, width: " + point.x + ", height: " + point.y);
 
-        return new Size(width, height);
+        return new Size(point.x, point.y);
+    }
+
+    public static float[] genQuadVertieces() {
+        float vertices[] = {
+                // positions       // texCoords
+                -1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
+                -1.0f, -1.0f, 0.0f,  0.0f, 0.0f,
+                1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
+
+                -1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
+                1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
+                1.0f,  1.0f, 0.0f,  1.0f, 1.0f
+        };
+
+        return vertices;
     }
 
     public static int getNavigationBarHeight(Context context) {
@@ -91,7 +113,13 @@ public class Utils {
         return statusHeight;
     }
 
-    public static boolean isHUAWEI() {
-        return android.os.Build.MANUFACTURER.equals("Huawei");
+    public static int checkGLError() {
+        int error = GLES30.glGetError();
+
+        if (0 != error) {
+            Log.e(TAG, "checkGLError, error: " + error + "\n" + Log.getStackTraceString(new Throwable()));
+        }
+
+        return error;
     }
 }

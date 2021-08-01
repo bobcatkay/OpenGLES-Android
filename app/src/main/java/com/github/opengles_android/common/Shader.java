@@ -10,7 +10,7 @@ import java.util.Map;
 public class Shader {
     private final static String TAG = "Shader";
     private int mProgram;
-    private Map<String, Object> mParamLocations = new HashMap<>();
+    private Map<String, Integer> mParamLocations = new HashMap<>();
 
     public Shader(Context context, String vertexFileName, String fragmentFileName) {
         this(Utils.getStringFromAssets(context, vertexFileName), Utils.getStringFromAssets(context, fragmentFileName));
@@ -71,7 +71,7 @@ public class Shader {
     }
 
     public void setMat4(String name, float[] value) {
-        GLES30.glUniform4fv(getUniformLocation(name), 1, value, 0);
+        GLES30.glUniformMatrix4fv(getUniformLocation(name), 1, false, value, 0);
     }
 
     private int getUniformLocation(String name) {
@@ -79,10 +79,11 @@ public class Shader {
 
         if (null == mParamLocations.get(name)) {
             location = GLES30.glGetUniformLocation(mProgram, name);
-            Log.i(TAG, "getUniformLocation, Set location, name: " + name + ", location: " + location);
             mParamLocations.put(name, location);
+
+            Log.i(TAG, "getUniformLocation, Set location, name: " + name + ", location: " + location);
         } else {
-            location = (int) mParamLocations.get(name);
+            location = mParamLocations.get(name);
         }
 
         return location;
@@ -90,5 +91,9 @@ public class Shader {
 
     public void use() {
         GLES30.glUseProgram(mProgram);
+    }
+
+    public void release() {
+        GLES30.glDeleteShader(mProgram);
     }
 }
