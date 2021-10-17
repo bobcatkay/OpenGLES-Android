@@ -9,6 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.OpenGLESAndroid">
+
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop">
@@ -21,9 +22,11 @@
         <activity
             android:name=".examples.triangle.TriangleActivity"
             android:theme="@style/Theme.OpenGLESAndroid.Fullscreen" />
-
         <activity
             android:name=".examples.bitmap.BitmapActivity"
+            android:theme="@style/Theme.OpenGLESAndroid.Fullscreen" />
+        <activity
+            android:name=".examples.native_render.NativeRenderActivity"
             android:theme="@style/Theme.OpenGLESAndroid.Fullscreen" />
     </application>
 

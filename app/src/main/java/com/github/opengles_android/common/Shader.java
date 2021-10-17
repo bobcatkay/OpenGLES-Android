@@ -26,7 +26,7 @@ public class Shader {
         int program = GLES30.glCreateProgram();
 
         if (0 == program) {
-            Log.e(TAG, "createProgram: Create program error!", new Throwable());
+            Log.e(TAG, "createProgram: Create mShaderProgram error!", new Throwable());
             return 0;
         }
 
@@ -40,7 +40,7 @@ public class Shader {
 
         if (0 == result[0]) {
             String log = GLES30.glGetProgramInfoLog(program);
-            Log.e(TAG, "loadShader: Link program error!" + log, new Throwable());
+            Log.e(TAG, "loadShader: Link mShaderProgram error!" + log, new Throwable());
             return 0;
         }
 
@@ -72,6 +72,10 @@ public class Shader {
 
     public void setMat4(String name, float[] value) {
         GLES30.glUniformMatrix4fv(getUniformLocation(name), 1, false, value, 0);
+    }
+
+    public void setVec2(String name, float[] value) {
+        GLES30.glUniform2fv(getUniformLocation(name), 1, value, 0);
     }
 
     private int getUniformLocation(String name) {

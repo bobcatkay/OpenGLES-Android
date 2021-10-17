@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Android/OpenGLES-Android/app/src/main/res/layout/activity_bitmap.xml" value="0.4354166666666667" />
+        <entry key="..\:/Android/OpenGLES-Android/app/src/main/res/layout/activity_main.xml" value="0.4390625" />
+        <entry key="..\:/Android/OpenGLES-Android/app/src/main/res/layout/activity_native_render.xml" value="0.46875" />
+        <entry key="..\:/Android/OpenGLES-Android/app/src/main/res/layout/activity_triangle.xml" value="0.46875" />
+      </map>
+    </option>
+  </component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
