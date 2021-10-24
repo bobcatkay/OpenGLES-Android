@@ -16,6 +16,7 @@ public class CameraActivity extends FullScreenActivity {
 
     private int CODE_PERMISSION_CAMERA;
     private CameraController mCameraController;
+    private CameraRenderer mCameraRenderer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,14 +24,15 @@ public class CameraActivity extends FullScreenActivity {
         setContentView(R.layout.activity_camera);
 
         SurfaceView cameraView = findViewById(R.id.camera_surface_view);
-        CameraRenderer cameraRenderer = new CameraRenderer();
-        cameraView.getHolder().addCallback(cameraRenderer);
+        mCameraRenderer = new CameraRenderer(this);
+        cameraView.getHolder().addCallback(mCameraRenderer);
 
         checkPermission();
     }
 
     private void initCamera() {
         mCameraController = new CameraController(this);
+        mCameraController.setImageReceivedListener(mCameraRenderer);
         mCameraController.init();
     }
 

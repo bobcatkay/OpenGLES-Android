@@ -12,7 +12,9 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
+import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.TotalCaptureResult;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Build;
@@ -35,13 +37,16 @@ import androidx.annotation.RequiresApi;
 public class CameraController {
     private static final String TAG = "CameraController";
     private static final int MSG_ON_CONFIGURED = 0x100;
+    private static final int MSG_DO_PREV_CAPTURE = 0x101;
     private static final float RATIO = 4.0f / 3;
     private static final int MAX_SIZE = 1920;
 
     private Activity mActivity;
     private CameraManager mCameraManager;
     private HandlerThread mCameraThread = new HandlerThread("CameraThread");
+    private HandlerThread mImageThread = new HandlerThread("mImageThread");
     private Handler mCameraHandler;
+    private Handler mIMageHandler;
     private CameraDevice mCameraDevice;
     private CameraCharacteristics mCameraCharacteristics;
     private String mCameraId;
@@ -49,6 +54,7 @@ public class CameraController {
     private ImageReader mImageReader;
     private CaptureRequest mPrevCaptureRequest;
     private CameraCaptureSession mCaptureSession;
+    private OnImageReceivedListener mImageReceivedListener;
 
     private CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
         @Override
@@ -87,12 +93,29 @@ public class CameraController {
         @RequiresApi(api = Build.VERSION_CODES.P)
         @Override
         public void onImageAvailable(ImageReader reader) {
-            Image image = reader.acquireLatestImage();
-            HardwareBuffer hardwareBuffer = image.getHardwareBuffer();
-            Log.d(TAG, "onImageAvailable: hardwareBuffer: " + hardwareBuffer.getHeight() + "x" + hardwareBuffer.getWidth());
+            Image image = reader.acquireNextImage();
 
-            hardwareBuffer.close();
+            if (null != mImageReceivedListener) {
+                mImageReceivedListener.onImageReceived(image);
+            }
+
             image.close();
+        }
+    };
+
+    private CameraCaptureSession.CaptureCallback mPrevCaptureCallback = new CameraCaptureSession.CaptureCallback() {
+        @Override
+        public void onCaptureStarted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, long timestamp, long frameNumber) {
+        }
+
+        @Override
+        public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
+            //mCameraHandler.sendEmptyMessage(MSG_DO_PREV_CAPTURE);
+        }
+
+        @Override
+        public void onCaptureFailed(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull CaptureFailure failure) {
+            Log.e(TAG, "onCaptureFailed: ");
         }
     };
 
@@ -136,7 +159,7 @@ public class CameraController {
                     case MSG_ON_CONFIGURED:
                         try {
                             CaptureRequest request[] = new CaptureRequest[] {mPrevCaptureRequest};
-                            mCaptureSession.setRepeatingBurst(Arrays.asList(request.clone()), null, mCameraHandler);
+                            mCaptureSession.setRepeatingBurst(Arrays.asList(request.clone()), mPrevCaptureCallback, mIMageHandler);
                         } catch (CameraAccessException e) {
                             e.printStackTrace();
                         }
@@ -148,6 +171,9 @@ public class CameraController {
                 }
             }
         };
+
+        mImageThread.start();
+        mIMageHandler = new Handler(mImageThread.getLooper());
     }
 
     @SuppressLint("MissingPermission")
@@ -191,12 +217,16 @@ public class CameraController {
         Log.d(TAG, "createCaptureRequest");
 
         try {
-            CaptureRequest.Builder builder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            CaptureRequest.Builder builder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
             builder.addTarget(mImageReader.getSurface());
             mPrevCaptureRequest = builder.build();
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setImageReceivedListener(OnImageReceivedListener imageReceivedListener) {
+        mImageReceivedListener = imageReceivedListener;
     }
 
     public void onResume() {

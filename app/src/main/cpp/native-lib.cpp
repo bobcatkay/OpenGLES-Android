@@ -4,7 +4,6 @@
 #include <android/native_window_jni.h>
 #include <EGL/egl.h>
 #include <GLES3/gl3.h>
-#include <string>
 #include <unistd.h>
 
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,"native-lib",__VA_ARGS__)
@@ -173,7 +172,7 @@ GLuint InitShaderProgram(const char* vertexCode, const char* fragCode) {
 }
 
 GLuint LoadShader(const char *code, GLenum type) {
-    LOGD("createShader");
+    LOGD("LoadShader");
 
     // Create the shader object
     GLuint shader = glCreateShader(type);
