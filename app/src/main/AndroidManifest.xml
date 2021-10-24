@@ -2,6 +2,8 @@
 <manifest package="com.github.opengles_android"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -28,6 +30,10 @@
         <activity
             android:name=".examples.native_render.NativeRenderActivity"
             android:theme="@style/Theme.OpenGLESAndroid.Fullscreen" />
+        <activity
+            android:name=".examples.camera.CameraActivity"
+            android:theme="@style/Theme.OpenGLESAndroid.Fullscreen"
+            android:screenOrientation="portrait"/>
     </application>
 
     <uses-feature

@@ -3,6 +3,8 @@ package com.github.opengles_android.common;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.params.StreamConfigurationMap;
 import android.opengl.GLES30;
 import android.provider.Settings;
 import android.util.Log;
@@ -121,5 +123,22 @@ public class Utils {
         }
 
         return error;
+    }
+
+    public static Size getOptimalCameraSize(CameraCharacteristics cc, Class<?> clazz, int maxSize, float ratio){
+        StreamConfigurationMap configurationMap = cc.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+        Size[] outputSizes = configurationMap.getOutputSizes(clazz);
+
+        for(Size size: outputSizes){
+            Log.d("Util", "getOptimalSize, width: " + size.getWidth() + ", height: " + size.getHeight());
+
+            float sizeRatio = (float) size.getWidth() / (float) size.getHeight();
+
+            if ((Float.compare(sizeRatio, ratio) == 0) && (size.getHeight() <= maxSize && size.getWidth() <= maxSize)) {
+                return size;
+            }
+        }
+
+        return null;
     }
 }

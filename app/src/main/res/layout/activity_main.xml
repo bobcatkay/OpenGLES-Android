@@ -51,6 +51,18 @@
                 android:textAllCaps="false"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/button_triangle" />
+
+            <Button
+                android:id="@+id/button_camera"
+                android:layout_width="@dimen/button_size"
+                android:layout_height="@dimen/button_size"
+                app:layout_constraintTop_toBottomOf="@+id/button_bitmap"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="@dimen/item_margin"
+                android:textColor="@color/white"
+                android:text="Camera"
+                android:textAllCaps="false"
+                android:backgroundTint="@color/orange"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </FrameLayout>
