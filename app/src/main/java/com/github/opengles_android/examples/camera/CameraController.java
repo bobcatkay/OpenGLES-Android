@@ -5,16 +5,13 @@ import android.app.Activity;
 import android.app.Service;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
-import android.hardware.HardwareBuffer;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
-import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
-import android.hardware.camera2.TotalCaptureResult;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Build;
@@ -43,10 +40,10 @@ public class CameraController {
 
     private Activity mActivity;
     private CameraManager mCameraManager;
-    private HandlerThread mCameraThread = new HandlerThread("CameraThread");
-    private HandlerThread mImageThread = new HandlerThread("mImageThread");
+    private HandlerThread mCameraThread;
+    private HandlerThread mImageThread;
     private Handler mCameraHandler;
-    private Handler mIMageHandler;
+    private Handler mImageHandler;
     private CameraDevice mCameraDevice;
     private CameraCharacteristics mCameraCharacteristics;
     private String mCameraId;
@@ -61,6 +58,7 @@ public class CameraController {
         public void onOpened(@NonNull CameraDevice camera) {
             Log.d(TAG, "onOpened: ");
             mCameraDevice = camera;
+            createPrevCaptureSession();
         }
 
         @Override
@@ -103,22 +101,6 @@ public class CameraController {
         }
     };
 
-    private CameraCaptureSession.CaptureCallback mPrevCaptureCallback = new CameraCaptureSession.CaptureCallback() {
-        @Override
-        public void onCaptureStarted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, long timestamp, long frameNumber) {
-        }
-
-        @Override
-        public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
-            //mCameraHandler.sendEmptyMessage(MSG_DO_PREV_CAPTURE);
-        }
-
-        @Override
-        public void onCaptureFailed(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull CaptureFailure failure) {
-            Log.e(TAG, "onCaptureFailed: ");
-        }
-    };
-
     public CameraController(Activity activity) {
         mActivity = activity;
     }
@@ -151,6 +133,8 @@ public class CameraController {
     }
 
     private void initHandler() {
+        mCameraThread = new HandlerThread("CameraThread");
+        mImageThread = new HandlerThread("mImageThread");
         mCameraThread.start();
         mCameraHandler = new Handler(mCameraThread.getLooper()) {
             @Override
@@ -159,7 +143,7 @@ public class CameraController {
                     case MSG_ON_CONFIGURED:
                         try {
                             CaptureRequest request[] = new CaptureRequest[] {mPrevCaptureRequest};
-                            mCaptureSession.setRepeatingBurst(Arrays.asList(request.clone()), mPrevCaptureCallback, mIMageHandler);
+                            mCaptureSession.setRepeatingBurst(Arrays.asList(request.clone()), null, mImageHandler);
                         } catch (CameraAccessException e) {
                             e.printStackTrace();
                         }
@@ -173,16 +157,22 @@ public class CameraController {
         };
 
         mImageThread.start();
-        mIMageHandler = new Handler(mImageThread.getLooper());
+        mImageHandler = new Handler(mImageThread.getLooper());
     }
 
     @SuppressLint("MissingPermission")
     private void openCamera() {
+        Log.d(TAG, "openCamera");
+
         try {
             mCameraManager.openCamera(mCameraId, mStateCallback, mCameraHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
+    }
+
+    private void createPrevCaptureSession() {
+        Log.d(TAG, "createPrevCaptureSession");
 
         mPreviewSize = Utils.getOptimalCameraSize(mCameraCharacteristics, SurfaceTexture.class, MAX_SIZE, RATIO);
 
@@ -192,13 +182,7 @@ public class CameraController {
             return;
         }
 
-        Log.d(TAG, "open:, mPreviewSize: " + mPreviewSize.getWidth() + "x" + mPreviewSize.getHeight());
-
-        createPrevCaptureSession();
-    }
-
-    private void createPrevCaptureSession() {
-        Log.d(TAG, "createPrevCaptureSession");
+        Log.d(TAG, "createPrevCaptureSession, mPreviewSize: " + mPreviewSize.getWidth() + "x" + mPreviewSize.getHeight());
 
         mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(), ImageFormat.YUV_420_888, 3);
         mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mCameraHandler);
@@ -258,6 +242,7 @@ public class CameraController {
 
     public void onDestroy() {
         mCameraThread.quitSafely();
+        mImageThread.quitSafely();
     }
 
 }
