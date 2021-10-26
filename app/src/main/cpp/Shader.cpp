@@ -15,15 +15,15 @@ Shader::Shader(const char *vertexCode, const char *fragCode) {
     InitShaderProgram(vertexCode, fragCode);
 }
 
-void Shader::SetMat4(std::string name, const glm::mat4 &mat) {
+void Shader::SetMat4(const std::string& name, const glm::mat4& mat) {
     GLint location = GetUniformLocation(name);
 
-    if (location > 0) {
+    if (location != -1) {
         glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(mat));
     }
 }
 
-void Shader::SetInt(std::string name, int value) {
+void Shader::SetInt(const std::string& name, int value) {
     GLint location = GetUniformLocation(name);
 
     if (location > 0) {
@@ -31,7 +31,7 @@ void Shader::SetInt(std::string name, int value) {
     }
 }
 
-GLint Shader::GetUniformLocation(std::string name) {
+GLint Shader::GetUniformLocation(const std::string& name) {
     if (mUniformLocations.find(name) != mUniformLocations.end()) {
         return mUniformLocations[name];
     }

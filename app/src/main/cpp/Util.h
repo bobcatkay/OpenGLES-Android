@@ -16,12 +16,10 @@
 #include <android/hardware_buffer_jni.h>
 #include <media/NdkImageReader.h>
 
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, "render", __VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "render", __VA_ARGS__)
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, "camera_renderer", __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "camera_renderer", __VA_ARGS__)
 
 
 void JniInit(JNIEnv* env, jobject assetManager);
 
 std::string ReadFileFromAssets(const char* fileName);
-
-void BindHardwareBuffer(GLuint texId, AHardwareBuffer* buffer);

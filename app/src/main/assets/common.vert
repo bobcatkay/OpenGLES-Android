@@ -8,7 +8,6 @@ uniform mat4 uProjection;
 out vec2 vTexCoords;
 
 void main() {
-    //gl_Position = uTransform * uProjection * vec4(aPos, 1.0);
-    gl_Position = vec4(aPos, 1.0);
+    gl_Position = uTransform * uProjection * vec4(aPos, 1.0);
     vTexCoords = aTexCoords;
 }

@@ -3,22 +3,17 @@
 //
 
 #include "Renderer.h"
-#include <thread>
-
-static std::mutex sMutex;
 
 Renderer::Renderer(ANativeWindow *window, int surfaceWidth, int surfaceHeight) {
     pWindow = window;
     mWindowWidth = surfaceWidth;
     mWindowHeight = surfaceHeight;
-    InitContext();
-    Run();
+
+    Init();
 }
 
 Renderer::~Renderer() {
-    eglDestroySurface(mDisplay, mEglSurface);
-    eglDestroyContext(mDisplay, mContext);
-    ANativeWindow_release(pWindow);
+
 }
 
 void Renderer::InitContext() {
@@ -81,31 +76,6 @@ void Renderer::InitContext() {
     }
 }
 
-void Renderer::Run() {
-    const std::string vertexCode = ReadFileFromAssets("common.vert");
-    const std::string fragCode = ReadFileFromAssets("texture2d_oes.frag");
-    pShader = new Shader(vertexCode.c_str(), fragCode.c_str());
-
-    glGenTextures(1, &mTexId);
-    glBindTexture(GL_TEXTURE_EXTERNAL_OES, mTexId);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    InitVertex();
-
-    while (!mbShutDown) {
-        glViewport(0, 0, mWindowWidth, mWindowHeight);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(1.0f,1.0f,0.0f,1.0f);
-
-        onDraw();
-
-        eglSwapBuffers(mDisplay, mEglSurface);
-    }
-}
-
 void Renderer::InitVertex() {
     float vertices[] = {
             // positions           // texture coords
@@ -140,39 +110,120 @@ void Renderer::InitVertex() {
     glEnableVertexAttribArray(1);
 }
 
-void Renderer::onDraw() {
-    LOGD("onDraw");
+void Renderer::BindHardwareBuffer(GLuint texId, AHardwareBuffer* buffer) {
+    EGLClientBuffer clientBuffer = eglGetNativeClientBufferANDROID(buffer);
 
-//    std::lock_guard<std::mutex> lock(sMutex);
-//    if (!mBufferList.empty()) {
-    if (nullptr != pBuffer) {
-        LOGD("onDraw, texId: %d.", mTexId);
-
-//        AHardwareBuffer *pBuffer = mBufferList.back();
-//        mBufferList.pop_back();
-        BindHardwareBuffer(mTexId, pBuffer);
-
-        LOGD("onDraw, texId: %d.", mTexId);
-
-        pBuffer = nullptr;
+    if (nullptr == clientBuffer) {
+        LOGE("BindHardwareBuffer, clientBuffer is null.");
+        return;
     }
+
+    // Create EGLImage from EGLClientBuffer.
+    EGLImageKHR image = eglCreateImageKHR(mDisplay, EGL_NO_CONTEXT, EGL_NATIVE_BUFFER_ANDROID, clientBuffer, IMAGE_KHR_ATTR);
+
+    if (nullptr == image) {
+        LOGE("BindHardwareBuffer, image is null.");
+        return;
+    }
+
+    // Create OpenGL texture from the EGLImage.
+    glBindTexture(GL_TEXTURE_EXTERNAL_OES, texId);
+    glEGLImageTargetTexture2DOES(GL_TEXTURE_EXTERNAL_OES, image);
+}
+
+void Renderer::Init() {
+    float aspectRatio = mWindowWidth > mWindowHeight ?
+                        (float) mWindowWidth / (float) mWindowHeight :
+                        (float) mWindowHeight / (float) mWindowWidth;
+
+    if (mWindowWidth < mWindowHeight) {
+        mProjectionMatrix = glm::ortho(-aspectRatio, aspectRatio, -1.0f, 1.0f, -1.0f, 1.0f);
+    } else {
+        mProjectionMatrix = glm::ortho(-1.0f, 1.0f, -aspectRatio, aspectRatio, -1.0f, 1.0f);
+    }
+
+    InitContext();
+
+    const std::string vertexCode = ReadFileFromAssets("common.vert");
+    const std::string fragCode = ReadFileFromAssets("texture2d_oes.frag");
+    pShader = new Shader(vertexCode.c_str(), fragCode.c_str());
+
+    glGenTextures(1, &mTexId);
+    glBindTexture(GL_TEXTURE_EXTERNAL_OES, mTexId);
+
+    InitVertex();
+}
+
+void Renderer::UpdateTexture(AHardwareBuffer* buffer, int width, int height) {
+    if (nullptr == buffer) {
+        return;
+    }
+
+    if ((mLastBufferWidth != width) || (mLastBufferHeight != height)) {
+        mLastBufferWidth = width;
+        mLastBufferHeight = height;
+        mTransformMatrix = glm::mat4(1.0f);
+        float scaleY = 1.0f;
+        float scaleX = 1.0f;
+
+        if (mWindowHeight > mWindowWidth) {
+            scaleY = (float) height / width;
+        } else {
+            scaleX = (float) width / height;
+        }
+
+        LOGD("UpdateTexture, mWindowWidth: %d, mWindowHeight: %d, width: %d, height: %d, scaleY: %.1f.", mWindowWidth,
+             mWindowHeight, width, height, scaleY);
+
+        mTransformMatrix = glm::scale(mTransformMatrix, glm::vec3(scaleX, scaleY, 1.0f));
+        mTransformMatrix = glm::rotate(mTransformMatrix, glm::radians(270.0f), glm::vec3(0, 0, 1.0f));
+
+        // Left-Right mirror
+        mTransformMatrix = glm::scale(mTransformMatrix, glm::vec3(1.0f, -1.0f, 1.0f));
+    }
+
+    if (nullptr != pLastBuffer) {
+        AHardwareBuffer_release(pLastBuffer);
+    }
+
+    BindHardwareBuffer(mTexId, buffer);
+    pLastBuffer = buffer;
+}
+
+void Renderer::onDrawFrame(AHardwareBuffer *buffer, int width, int height) {
+    glViewport(0, 0, mWindowWidth, mWindowHeight);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(1.0f,1.0f,0.0f,1.0f);
+
+    UpdateTexture(buffer, width, height);
 
     pShader->UseProgram();
     pShader->SetInt("uTexture", 0);
+    pShader->SetMat4("uProjection", mProjectionMatrix);
+    pShader->SetMat4("uTransform", mTransformMatrix);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, mTexId);
 
     glBindVertexArray(mVAO);
     glDrawElements(GL_TRIANGLES, mVertexCount, GL_UNSIGNED_INT, 0);
+
+    eglSwapBuffers(mDisplay, mEglSurface);
 }
 
-void Renderer::ShutDown() {
-    mbShutDown = true;
-}
+void Renderer::Release() {
+    eglDestroySurface(mDisplay, mEglSurface);
+    eglDestroyContext(mDisplay, mContext);
+    ANativeWindow_release(pWindow);
 
-void Renderer::AddBuffer(AHardwareBuffer* buffer) {
-//    std::lock_guard<std::mutex> lock(sMutex);
-//    mBufferList.push_front(buffer);
-    pBuffer = buffer;
+    glDeleteBuffers(1, &mVAO);
+    glDeleteTextures(1, &mTexId);
+
+    if (nullptr != pShader) {
+        delete(pShader);
+    }
+
+    if (nullptr != pLastBuffer) {
+        AHardwareBuffer_release(pLastBuffer);
+    }
 }
 

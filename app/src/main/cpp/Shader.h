@@ -12,9 +12,6 @@
 #include "glm/ext.hpp"
 #include "Util.h"
 
-//#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, "Shader" ,__VA_ARGS__)
-//#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "Shader" ,__VA_ARGS__)
-
 class Shader {
 public:
     Shader() {};
@@ -22,8 +19,8 @@ public:
     ~Shader();
 
     void UseProgram();
-    void SetMat4(std::string name, const glm::mat4& mat);
-    void SetInt(std::string name, int value);
+    void SetMat4(const std::string& name, const glm::mat4& mat);
+    void SetInt(const std::string& name, int value);
 
 private:
     GLuint mProgram = 0;
@@ -31,7 +28,7 @@ private:
 
     void InitShaderProgram(const char* vertexCode, const char* fragCode);
     GLuint LoadShader(const char* code, GLenum type);
-    GLint GetUniformLocation(std::string name);
+    GLint GetUniformLocation(const std::string& name);
 };
 
 

@@ -20,30 +20,29 @@ Java_com_github_opengles_1android_examples_camera_CameraRenderer_init(JNIEnv *en
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_github_opengles_1android_examples_camera_CameraRenderer_addBuffer(JNIEnv *env,
-                                                                           jobject thiz,
-                                                                           jobject buffer,
-                                                                           jint width,
-                                                                           jint height) {
-
-    AHardwareBuffer *pBuffer = AHardwareBuffer_fromHardwareBuffer(env, buffer);
-
-    if (nullptr != pBuffer) {
-        LOGE("addBuffer, pBuffer is not null.");
-        pRenderer->AddBuffer(pBuffer);
-    } else {
-        LOGE("addBuffer, pBuffer is null.");
+Java_com_github_opengles_1android_examples_camera_CameraRenderer_release(JNIEnv *env,
+                                                                         jobject thiz) {
+    if (nullptr != pRenderer) {
+        pRenderer->Release();
+        pRenderer = nullptr;
     }
-
-    //AHardwareBuffer_release(pBuffer);
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_github_opengles_1android_examples_camera_CameraRenderer_shutDown(JNIEnv *env,
-                                                                          jobject thiz) {
-    if (nullptr != pRenderer) {
-        pRenderer->ShutDown();
-        pRenderer = nullptr;
+Java_com_github_opengles_1android_examples_camera_CameraRenderer_onDrawFrame(JNIEnv *env,
+                                                                             jobject thiz,
+                                                                             jobject buffer,
+                                                                             jint width,
+                                                                             jint height) {
+    AHardwareBuffer *pBuffer = AHardwareBuffer_fromHardwareBuffer(env, buffer);
+
+    if (nullptr != pBuffer) {
+        if (nullptr != pRenderer) {
+            pRenderer->onDrawFrame(pBuffer, width, height);
+        }
+    } else {
+        LOGE("addBuffer, pBuffer is null.");
     }
+
 }
