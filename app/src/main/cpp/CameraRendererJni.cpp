@@ -2,9 +2,9 @@
 // Created by xulinkai on 2021/10/24.
 //
 
-#include "Renderer.h"
+#include "CameraRenderer.h"
 
-Renderer *pRenderer;
+CameraRenderer *pRenderer;
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -13,9 +13,9 @@ Java_com_github_opengles_1android_examples_camera_CameraRenderer_init(JNIEnv *en
                                                                       jint surface_width,
                                                                       jint surface_height,
                                                                       jobject assetManager) {
-    JniInit(env, assetManager);
+    InitUtil(env, assetManager);
     ANativeWindow *window = ANativeWindow_fromSurface(env, surface);
-    pRenderer = new Renderer(window, surface_width, surface_height);
+    pRenderer = new CameraRenderer(window, surface_width, surface_height);
 }
 
 extern "C"
@@ -24,7 +24,7 @@ Java_com_github_opengles_1android_examples_camera_CameraRenderer_release(JNIEnv 
                                                                          jobject thiz) {
     if (nullptr != pRenderer) {
         pRenderer->Release();
-        pRenderer = nullptr;
+        delete(pRenderer);
     }
 }
 
@@ -39,7 +39,7 @@ Java_com_github_opengles_1android_examples_camera_CameraRenderer_onDrawFrame(JNI
 
     if (nullptr != pBuffer) {
         if (nullptr != pRenderer) {
-            pRenderer->onDrawFrame(pBuffer, width, height);
+            pRenderer->OnDrawFrame(pBuffer, width, height);
         }
     } else {
         LOGE("addBuffer, pBuffer is null.");

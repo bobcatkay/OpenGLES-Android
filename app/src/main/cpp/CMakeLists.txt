@@ -15,6 +15,18 @@ ADD_SUBDIRECTORY("${PROJECT_SOURCE_DIR}/glm")
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
+add_library(libffmpeg
+        SHARED
+        IMPORTED
+        )
+
+SET_TARGET_PROPERTIES(
+        libffmpeg
+        PROPERTIES IMPORTED_LOCATION
+        ${PROJECT_SOURCE_DIR}/libs/${ANDROID_ABI}/libffmpeg.so
+)
+include_directories(${PROJECT_SOURCE_DIR}/ffmpeg)
+
 add_library( # Sets the name of the library.
              native-lib
 
@@ -52,18 +64,34 @@ target_link_libraries( # Specifies the target library.
                         # included in the NDK.
                         ${log-lib})
 
-add_library(renderer
+add_library(camera_renderer
         SHARED
-        CameraRendererJni.cpp Renderer.cpp Shader.cpp Util.cpp)
+        CameraRendererJni.cpp CameraRenderer.cpp Shader.cpp Util.cpp)
 
 target_link_libraries( # Specifies the target library.
-        renderer
+        camera_renderer
         glm_shared
         GLESv3
         GLESv2
         EGL
         android
-        mediandk
+
+        # Links the target library to the log library
+        # included in the NDK.
+        ${log-lib} )
+
+add_library(video_renderer
+        SHARED
+        VideoRendererJni.cpp VideoRenderer.cpp Shader.cpp Util.cpp VideoDecoder.cpp)
+
+target_link_libraries( # Specifies the target library.
+        video_renderer
+        glm_shared
+        libffmpeg
+        GLESv3
+        GLESv2
+        EGL
+        android
 
         # Links the target library to the log library
         # included in the NDK.

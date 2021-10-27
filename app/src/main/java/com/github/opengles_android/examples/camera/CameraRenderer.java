@@ -19,7 +19,7 @@ import androidx.annotation.RequiresApi;
 
 public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImageReceivedListener {
     static {
-        System.loadLibrary("renderer");
+        System.loadLibrary("camera_renderer");
     }
 
     private final static String TAG = "CameraRenderer";
@@ -42,9 +42,9 @@ public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImage
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
         Log.e(TAG, "surfaceCreated");
 
+        mbShutDown = false;
         mSurface = holder.getSurface();
         mGLThread = new Thread(this);
-        mbShutDown = false;
     }
 
     @Override

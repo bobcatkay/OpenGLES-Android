@@ -1,6 +1,10 @@
 //
 // Created by xulinkai on 2021/10/24.
 //
+
+#ifndef UTIL_H
+#define UTIL_H
+
 #include <jni.h>
 #include <string>
 #include <android/log.h>
@@ -19,7 +23,18 @@
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, "camera_renderer", __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "camera_renderer", __VA_ARGS__)
 
+const EGLint IMAGE_KHR_ATTR[3] = {EGL_IMAGE_PRESERVED_KHR, EGL_TRUE, EGL_NONE};
 
-void JniInit(JNIEnv* env, jobject assetManager);
+void InitUtil(JNIEnv* env, jobject assetManager);
 
 std::string ReadFileFromAssets(const char* fileName);
+
+void GetAssetPath(char path[], const char* fileName);
+
+void InitQuadVAO(GLuint& vao);
+
+void InitContext(EGLDisplay& display, ANativeWindow* window, EGLSurface& surface, EGLContext& context);
+
+void BindHardwareBuffer(GLuint texId, AHardwareBuffer* buffer, EGLDisplay& display);
+
+#endif

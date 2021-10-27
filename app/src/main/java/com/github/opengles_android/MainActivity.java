@@ -9,6 +9,7 @@ import com.github.opengles_android.examples.bitmap.BitmapActivity;
 import com.github.opengles_android.examples.camera.CameraActivity;
 import com.github.opengles_android.examples.native_render.NativeRenderActivity;
 import com.github.opengles_android.examples.triangle.TriangleActivity;
+import com.github.opengles_android.examples.video.VideoActivity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         binding.buttonBitmap.setOnClickListener(this);
         binding.buttonNativeRender.setOnClickListener(this);
         binding.buttonCamera.setOnClickListener(this);
+        binding.buttonVideo.setOnClickListener(this);
     }
 
     @Override
@@ -46,6 +48,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.button_camera:
                 goToActivity(CameraActivity.class);
+                break;
+
+            case R.id.button_video:
+                goToActivity(VideoActivity.class);
                 break;
         }
     }

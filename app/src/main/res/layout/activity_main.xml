@@ -36,7 +36,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginTop="@dimen/item_margin"
                 android:textColor="@color/white"
-                android:text="Texture"
+                android:text="Bitmap"
                 android:textAllCaps="false"
                 android:backgroundTint="@color/orange"/>
 
@@ -61,6 +61,18 @@
                 android:layout_marginTop="@dimen/item_margin"
                 android:textColor="@color/white"
                 android:text="Camera"
+                android:textAllCaps="false"
+                android:backgroundTint="@color/orange"/>
+
+            <Button
+                android:id="@+id/button_video"
+                android:layout_width="@dimen/button_size"
+                android:layout_height="@dimen/button_size"
+                app:layout_constraintTop_toBottomOf="@+id/button_native_render"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="@dimen/item_margin"
+                android:textColor="@color/white"
+                android:text="Video"
                 android:textAllCaps="false"
                 android:backgroundTint="@color/orange"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
