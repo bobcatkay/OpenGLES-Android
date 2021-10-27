@@ -171,7 +171,7 @@ PUT_NO_RND_PIXELS16_l2
 
 %macro MPEG4_QPEL16_H_LOWPASS 1
 cglobal %1_mpeg4_qpel16_h_lowpass, 5, 5, 0, 16
-    movsxdifnidn r2, R2d
+    movsxdifnidn r2, r2d
     movsxdifnidn r3, r3d
     pxor         m7, m7
 .loop:
@@ -304,7 +304,7 @@ MPEG4_QPEL16_H_LOWPASS put_no_rnd
 
 %macro MPEG4_QPEL8_H_LOWPASS 1
 cglobal %1_mpeg4_qpel8_h_lowpass, 5, 5, 0, 8
-    movsxdifnidn r2, R2d
+    movsxdifnidn r2, r2d
     movsxdifnidn r3, r3d
     pxor         m7, m7
 .loop:
@@ -400,7 +400,7 @@ MPEG4_QPEL8_H_LOWPASS put_no_rnd
 
 %macro MPEG4_QPEL16_V_LOWPASS 1
 cglobal %1_mpeg4_qpel16_v_lowpass, 4, 6, 0, 544
-    movsxdifnidn r2, R2d
+    movsxdifnidn r2, r2d
     movsxdifnidn r3, r3d
 
     mov         r4d, 17
@@ -496,7 +496,7 @@ MPEG4_QPEL16_V_LOWPASS put_no_rnd
 
 %macro MPEG4_QPEL8_V_LOWPASS 1
 cglobal %1_mpeg4_qpel8_v_lowpass, 4, 6, 0, 288
-    movsxdifnidn r2, R2d
+    movsxdifnidn r2, r2d
     movsxdifnidn r3, r3d
 
     mov         r4d, 9

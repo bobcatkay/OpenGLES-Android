@@ -87,7 +87,7 @@ SECTION .text
     pxor    m7, m3  ; d_sign ^= a0_sign
 
     pxor    m5, m5
-    movd    m3, R2d
+    movd    m3, r2d
 %if %1 > 4
     punpcklbw m3, m3
 %endif

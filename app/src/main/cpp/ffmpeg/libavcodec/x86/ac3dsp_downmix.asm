@@ -116,7 +116,7 @@ cglobal ac3_downmix_%1_to_%2, 3,in_channels+1,total_mmregs,0-matrix_elements_sta
     %assign %%i %%i+1
 %endrep
 
-    lea          lenq, [4*R2d]
+    lea          lenq, [4*r2d]
     ; load channel pointers to registers
 %assign %%i 1
 %rep (in_channels - 1)

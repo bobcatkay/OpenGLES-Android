@@ -92,10 +92,10 @@ cglobal add_median_pred, 6,6,8, dst, top, diff, w, left, left_top
     movu [dstq+wq], m7
     add      wq, mmsize
     jl .loop
-    movzx   R2d, byte [dstq-1]
-    mov [leftq], R2d
-    movzx   R2d, byte [topq-1]
-    mov [left_topq], R2d
+    movzx   r2d, byte [dstq-1]
+    mov [leftq], r2d
+    movzx   r2d, byte [topq-1]
+    mov [left_topq], r2d
     RET
 %endmacro
 

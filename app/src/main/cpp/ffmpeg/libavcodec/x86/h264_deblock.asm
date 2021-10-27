@@ -294,7 +294,7 @@ cglobal deblock_v_luma_8, 5,5,10, pix_, stride_, alpha_, beta_, base3_
     mova    m1, [base3_q + 2*stride_q] ; p0
     mova    m2, [pix_q]      ; q0
     mova    m3, [pix_q + stride_q]   ; q1
-    LOAD_MASK R2d, r3d
+    LOAD_MASK r2d, r3d
 
     punpcklbw m8, m8
     punpcklbw m8, m8 ; tc = 4x tc0[3], 4x tc0[2], 4x tc0[1], 4x tc0[0]
@@ -346,7 +346,7 @@ cglobal deblock_h_luma_8, 5,9,0,0x60+16*WIN64
     TRANSPOSE6x8_MEM  PASS8ROWS(r6, r5, r7, r8), pix_tmp+8
 
     ; vertical filter
-    ; alpha, beta, tc0 are still in R2d, r3d, r4
+    ; alpha, beta, tc0 are still in r2d, r3d, r4
     ; don't backup r6, r5, r7, r8 because deblock_v_luma_sse2 doesn't use them
     lea    r0, [pix_tmp+0x30]
     mov    r1d, 0x10
@@ -736,7 +736,7 @@ cglobal deblock_%1_luma_intra_8, 4,6,16,ARCH_X86_64*0x50-0x50
 %endif
     lea     r4, [r1*4]
     lea     r5, [r1*3] ; 3*stride
-    dec     R2d        ; alpha-1
+    dec     r2d        ; alpha-1
     jl .end
     neg     r4
     dec     r3d        ; beta-1
@@ -749,7 +749,7 @@ cglobal deblock_%1_luma_intra_8, 4,6,16,ARCH_X86_64*0x50-0x50
 %if ARCH_X86_64
     pxor    mpb_0, mpb_0
     mova    mpb_1, [pb_1]
-    LOAD_MASK R2d, r3d, t5 ; m5=beta-1, t5=alpha-1, m7=mask0
+    LOAD_MASK r2d, r3d, t5 ; m5=beta-1, t5=alpha-1, m7=mask0
     SWAP    7, 12 ; m12=mask0
     pavgb   t5, mpb_0
     pavgb   t5, mpb_1 ; alpha/4+1
@@ -764,7 +764,7 @@ cglobal deblock_%1_luma_intra_8, 4,6,16,ARCH_X86_64*0x50-0x50
     mova    mask1q, t4
     mova    mask1p, t2
 %else
-    LOAD_MASK R2d, r3d, t5 ; m5=beta-1, t5=alpha-1, m7=mask0
+    LOAD_MASK r2d, r3d, t5 ; m5=beta-1, t5=alpha-1, m7=mask0
     mova    m4, t5
     mova    mask0, m7
     pavgb   m4, [pb_0]
@@ -872,7 +872,7 @@ DEBLOCK_LUMA_INTRA v8
 INIT_MMX mmxext
 
 %macro CHROMA_V_START 0
-    dec    R2d      ; alpha-1
+    dec    r2d      ; alpha-1
     dec    r3d      ; beta-1
     mov    t5, r0
     sub    t5, r1
@@ -880,7 +880,7 @@ INIT_MMX mmxext
 %endmacro
 
 %macro CHROMA_H_START 0
-    dec    R2d
+    dec    r2d
     dec    r3d
     sub    r0, 2
     lea    t6, [r1*3]
@@ -926,7 +926,7 @@ cglobal deblock_h_chroma_8, 5,7
     TRANSPOSE4x8_LOAD  bw, wd, dq, PASS8ROWS(t5, r0, r1, t6)
     movq  buf0, m0
     movq  buf1, m3
-    LOAD_MASK  R2d, r3d
+    LOAD_MASK  r2d, r3d
     movd       m6, [r4] ; tc0
     punpcklbw  m6, m6
     pand       m7, m6
@@ -941,7 +941,7 @@ cglobal deblock_h_chroma_8, 5,7
 
 ALIGN 16
 ff_chroma_inter_body_mmxext:
-    LOAD_MASK  R2d, r3d
+    LOAD_MASK  r2d, r3d
     movd       m6, [r4] ; tc0
     punpcklbw  m6, m6
     pand       m7, m6
@@ -969,7 +969,7 @@ cglobal deblock_h_chroma422_8, 5, 6
     TRANSPOSE4x8B_LOAD PASS8ROWS(t5, r0, r1, t6)
     movq buf0, m0
     movq buf1, m3
-    LOAD_MASK R2d, r3d
+    LOAD_MASK r2d, r3d
     movd m6, [rsp]
     punpcklwd m6, m6
     pand m7, m6
@@ -984,7 +984,7 @@ cglobal deblock_h_chroma422_8, 5, 6
     TRANSPOSE4x8B_LOAD PASS8ROWS(t5, r0, r1, t6)
     movq buf0, m0
     movq buf1, m3
-    LOAD_MASK R2d, r3d
+    LOAD_MASK r2d, r3d
     movd m6, [rsp+4]
     punpcklwd m6, m6
     pand m7, m6
@@ -1046,7 +1046,7 @@ RET
 
 ALIGN 16
 ff_chroma_intra_body_mmxext:
-    LOAD_MASK R2d, r3d
+    LOAD_MASK r2d, r3d
     movq   m5, m1
     movq   m6, m2
     CHROMA_INTRA_P0  m1, m0, m3

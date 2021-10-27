@@ -195,8 +195,8 @@ cglobal add_hfyu_median_pred_int16, 7,7,0, dst, top, diff, mask, w, left, left_t
     movq [dstq+wq], mm7
     add      wq, 8
     jl .loop
-    movzx   R2d, word [dstq-2]
-    mov [leftq], R2d
-    movzx   R2d, word [topq-2]
-    mov [left_topq], R2d
+    movzx   r2d, word [dstq-2]
+    mov [leftq], r2d
+    movzx   r2d, word [topq-2]
+    mov [left_topq], r2d
     RET

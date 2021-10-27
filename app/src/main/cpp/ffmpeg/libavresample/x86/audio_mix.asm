@@ -341,7 +341,7 @@ cglobal mix_%1_to_%2_%3_flt, 3,in_channels+2,needed_mmregs+matrix_elements_mm, n
 
 ; load channel pointers to registers as offsets from the first channel pointer
 %if ARCH_X86_64
-    movsxd       lenq, R2d
+    movsxd       lenq, r2d
 %endif
     shl          lenq, 2-is_s16
 %assign %%i 1

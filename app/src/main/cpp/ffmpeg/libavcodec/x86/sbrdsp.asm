@@ -38,7 +38,7 @@ SECTION .text
 
 INIT_XMM sse
 cglobal sbr_sum_square, 2, 3, 6
-    mov        R2d, r1d
+    mov        r2d, r1d
     xorps       m0, m0
     xorps       m1, m1
     sar         r2, 3
@@ -147,7 +147,7 @@ cglobal sbr_hf_gen, 4,4,8, X_high, X_low, alpha0, alpha1, BW, S, E
     ; Set pointers
 %if ARCH_X86_64 == 0 || WIN64
     ; start and end 6th and 7th args on stack
-    mov        R2d, Sm
+    mov        r2d, Sm
     mov        r3d, Em
     DEFINE_ARGS X_high, X_low, start, end
 %else

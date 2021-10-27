@@ -747,7 +747,7 @@ CONV_FLTP_TO_FLT_2CH
 %macro CONV_FLTP_TO_FLT_6CH 0
 cglobal conv_fltp_to_flt_6ch, 2,8,7, dst, src, src1, src2, src3, src4, src5, len
 %if ARCH_X86_64
-    mov     lend, R2d
+    mov     lend, r2d
 %else
     %define lend dword r2m
 %endif

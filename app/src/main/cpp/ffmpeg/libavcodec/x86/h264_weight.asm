@@ -79,7 +79,7 @@ cglobal h264_weight_16, 6, 6, 0
     WEIGHT_OP 8, 12
     mova     [r0+8], m0
     add        r0, r1
-    dec        R2d
+    dec        r2d
     jnz .nextrow
     REP_RET
 
@@ -90,7 +90,7 @@ cglobal h264_weight_%1, 6, 6, %2
     WEIGHT_OP 0, mmsize/2
     mova     [r0], m0
     add        r0, r1
-    dec        R2d
+    dec        r2d
     jnz .nextrow
     REP_RET
 %endmacro
@@ -103,7 +103,7 @@ WEIGHT_FUNC_MM 16, 8
 %macro WEIGHT_FUNC_HALF_MM 2
 cglobal h264_weight_%1, 6, 6, %2
     WEIGHT_SETUP
-    sar       R2d, 1
+    sar       r2d, 1
     lea        r3, [r1*2]
 .nextrow:
     WEIGHT_OP 0, r1
@@ -115,7 +115,7 @@ cglobal h264_weight_%1, 6, 6, %2
     movh     [r0+r1], m0
 %endif
     add        r0, r3
-    dec        R2d
+    dec        r2d
     jnz .nextrow
     REP_RET
 %endmacro

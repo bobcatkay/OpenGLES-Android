@@ -11,8 +11,8 @@ void InitUtil(JNIEnv* env, jobject assetManager) {
 
 void GetAssetPath(char path[], const char* fileName) {
     AAsset *asset = AAssetManager_open(pAssetManager, fileName, AASSET_MODE_RANDOM);
-    off_t offset, length;
-    int fd = AAsset_openFileDescriptor(asset, &offset, &length);
+    off64_t offset, length;
+    int fd = AAsset_openFileDescriptor64(asset, &offset, &length);
     sprintf(path, "/proc/self/fd/%d", fd);
 
     AAsset_close(asset);
@@ -167,4 +167,13 @@ void BindHardwareBuffer(GLuint texId, AHardwareBuffer* buffer, EGLDisplay& displ
     // Create OpenGL texture from the EGLImage.
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, texId);
     glEGLImageTargetTexture2DOES(GL_TEXTURE_EXTERNAL_OES, image);
+}
+
+void GenTexture(Texture& texture) {
+    glGenTextures(1, &texture.id);
+    glBindTexture(GL_TEXTURE_2D, texture.id);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D,0,texture.format,texture.width, texture.height,0,texture.format,GL_UNSIGNED_BYTE,NULL);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }

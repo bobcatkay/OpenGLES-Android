@@ -380,7 +380,7 @@ fft32_avx:
 
 fft32_interleave_avx:
     call fft32_avx
-    mov R2d, 32
+    mov r2d, 32
 .deint_loop:
     mova     m2, Z(0)
     mova     m3, Z(1)
@@ -391,7 +391,7 @@ fft32_interleave_avx:
     vextractf128   Z(1), m0, 1
     vextractf128  ZH(1), m1, 1
     add r0, mmsize*2
-    sub R2d, mmsize/4
+    sub r2d, mmsize/4
     jg .deint_loop
     ret
 
@@ -770,7 +770,7 @@ fft %+ n %+ fullsuffix:
     call fft %+ n4 %+ SUFFIX
     sub r0, n*6 + (n2&(-2<<%1))
     lea r1, [cos_ %+ n]
-    mov R2d, n4/2
+    mov r2d, n4/2
     jmp pass %+ fullsuffix
 
 %assign n n*2

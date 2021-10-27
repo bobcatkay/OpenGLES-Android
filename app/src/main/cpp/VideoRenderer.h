@@ -11,11 +11,12 @@
 
 class VideoRenderer {
 public:
-    VideoRenderer(ANativeWindow* window, int surfaceWidth, int surfaceHeight);
+    VideoRenderer(ANativeWindow* window, int surfaceWidth, int surfaceHeight, int videoFileFD);
     ~VideoRenderer() {};
 
     void OnDrawFrame();
     void Release();
+    void VideoDecodeCallback(AVFrame* frame);
 
 private:
     const GLuint VERTEX_COUNT = 6;
@@ -28,11 +29,20 @@ private:
     int mWindowWidth = 0;
     int mWindowHeight = 0;
     GLuint mVAO;
-    GLuint mTexId = 0;
     glm::mat4 mProjectionMatrix = glm::mat4(1.0f);
     glm::mat4 mTransformMatrix = glm::mat4(1.0f);
+    Texture mTexture[3];
+    VideoDecoder* pVideoDecoder;
+    AVFrame* mFrame;
+    int mVideoWidth;
+    int mVideoHeight;
+    bool bVideoSizeInit = false;
 
     void Init();
+    void StartDecoder(int videoFileFD);
+    void FreeResources();
+    void UpdateTexture();
+    void InitYUVTexture();
 };
 
 

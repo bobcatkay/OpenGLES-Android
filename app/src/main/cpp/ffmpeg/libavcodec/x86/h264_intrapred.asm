@@ -143,16 +143,16 @@ cglobal pred16x16_dc_8, 2,7
     movd      r6d, mm0
     lea        r0, [r0+r1*2]
 %rep 7
-    movzx     R2d, byte [r0+r1*0]
+    movzx     r2d, byte [r0+r1*0]
     movzx     r3d, byte [r0+r1*1]
-    add       r5d, R2d
+    add       r5d, r2d
     add       r6d, r3d
     lea        r0, [r0+r1*2]
 %endrep
-    movzx     R2d, byte [r0+r1*0]
+    movzx     r2d, byte [r0+r1*0]
     add       r5d, r6d
-    lea       R2d, [r2+r5+16]
-    shr       R2d, 5
+    lea       r2d, [r2+r5+16]
+    shr       r2d, 5
 %if cpuflag(ssse3)
     pxor       m1, m1
 %endif
@@ -206,9 +206,9 @@ cglobal pred16x16_tm_vp8_8, 2,5
     movzx     r3d, byte [r0-1]
     mov       r4d, 16
 .loop:
-    movzx     R2d, byte [r0+r1-1]
-    sub       R2d, r3d
-    movd      mm4, R2d
+    movzx     r2d, byte [r0+r1-1]
+    sub       r2d, r3d
+    movd      mm4, r2d
     SPLATW    mm4, mm4, 0
     movq      mm5, mm4
     movq      mm6, mm4
@@ -243,11 +243,11 @@ cglobal pred16x16_tm_vp8_8, 2,6,6
     movzx       r4d, byte [r0-1]
     mov         r5d, 8
 .loop:
-    movzx       R2d, byte [r0+r1*1-1]
+    movzx       r2d, byte [r0+r1*1-1]
     movzx       r3d, byte [r0+r1*2-1]
-    sub         R2d, r4d
+    sub         r2d, r4d
     sub         r3d, r4d
-    movd       xmm2, R2d
+    movd       xmm2, r2d
     movd       xmm4, r3d
     pshuflw    xmm2, xmm2, 0
     pshuflw    xmm4, xmm4, 0
@@ -853,25 +853,25 @@ cglobal pred8x8_dc_8, 2,5
     mov       r4, r0
     psadbw    m1, m7            ; s1
 
-    movzx    R2d, byte [r0+r1*1-1]
+    movzx    r2d, byte [r0+r1*1-1]
     movzx    r3d, byte [r0+r1*2-1]
     lea       r0, [r0+r1*2]
-    add      R2d, r3d
+    add      r2d, r3d
     movzx    r3d, byte [r0+r1*1-1]
-    add      R2d, r3d
+    add      r2d, r3d
     movzx    r3d, byte [r0+r1*2-1]
-    add      R2d, r3d
+    add      r2d, r3d
     lea       r0, [r0+r1*2]
-    movd      m2, R2d            ; s2
-    movzx    R2d, byte [r0+r1*1-1]
+    movd      m2, r2d            ; s2
+    movzx    r2d, byte [r0+r1*1-1]
     movzx    r3d, byte [r0+r1*2-1]
     lea       r0, [r0+r1*2]
-    add      R2d, r3d
+    add      r2d, r3d
     movzx    r3d, byte [r0+r1*1-1]
-    add      R2d, r3d
+    add      r2d, r3d
     movzx    r3d, byte [r0+r1*2-1]
-    add      R2d, r3d
-    movd      m3, R2d            ; s3
+    add      r2d, r3d
+    movd      m3, r2d            ; s3
 
     punpcklwd m0, m1
     mov       r0, r4
@@ -915,17 +915,17 @@ cglobal pred8x8_dc_rv40_8, 2,7
     movd      r6d, mm0
     lea        r0, [r0+r1*2]
 %rep 3
-    movzx     R2d, byte [r0+r1*0]
+    movzx     r2d, byte [r0+r1*0]
     movzx     r3d, byte [r0+r1*1]
-    add       r5d, R2d
+    add       r5d, r2d
     add       r6d, r3d
     lea        r0, [r0+r1*2]
 %endrep
-    movzx     R2d, byte [r0+r1*0]
+    movzx     r2d, byte [r0+r1*0]
     add       r5d, r6d
-    lea       R2d, [r2+r5+8]
-    shr       R2d, 4
-    movd      mm0, R2d
+    lea       r2d, [r2+r5+8]
+    shr       r2d, 4
+    movd      mm0, r2d
     punpcklbw mm0, mm0
     pshufw    mm0, mm0, 0
     mov       r3d, 4
@@ -952,11 +952,11 @@ cglobal pred8x8_tm_vp8_8, 2,6
     movzx     r4d, byte [r0-1]
     mov       r5d, 4
 .loop:
-    movzx     R2d, byte [r0+r1*1-1]
+    movzx     r2d, byte [r0+r1*1-1]
     movzx     r3d, byte [r0+r1*2-1]
-    sub       R2d, r4d
+    sub       r2d, r4d
     sub       r3d, r4d
-    movd      mm2, R2d
+    movd      mm2, r2d
     movd      mm4, r3d
     SPLATW    mm2, mm2, 0
     SPLATW    mm4, mm4, 0
@@ -990,11 +990,11 @@ cglobal pred8x8_tm_vp8_8, 2,6,4
     movzx       r4d, byte [r0-1]
     mov         r5d, 4
 .loop:
-    movzx       R2d, byte [r0+r1*1-1]
+    movzx       r2d, byte [r0+r1*1-1]
     movzx       r3d, byte [r0+r1*2-1]
-    sub         R2d, r4d
+    sub         r2d, r4d
     sub         r3d, r4d
-    movd       xmm2, R2d
+    movd       xmm2, r2d
     movd       xmm3, r3d
     pshuflw    xmm2, xmm2, 0
     pshuflw    xmm3, xmm3, 0
@@ -1019,7 +1019,7 @@ cglobal pred8x8_tm_vp8_8, 2,3,6
     punpcklbw  xmm0, xmm1
     movd       xmm5, [r0-4]
     pshufb     xmm5, xmm4
-    mov         R2d, 4
+    mov         r2d, 4
 .loop:
     movd       xmm2, [r0+r1*1-4]
     movd       xmm3, [r0+r1*2-4]
@@ -1033,7 +1033,7 @@ cglobal pred8x8_tm_vp8_8, 2,3,6
     movq   [r0+r1*1], xmm2
     movhps [r0+r1*2], xmm2
     lea          r0, [r0+r1*2]
-    dec         R2d
+    dec         r2d
     jg .loop
     REP_RET
 
@@ -1066,7 +1066,7 @@ cglobal pred8x8l_top_dc_8, 4,4
     PALIGNR     mm1, mm4, 1, mm4
     test        r1d, r1d ; top_left
     jz .fix_lt_2
-    test        R2d, R2d ; top_right
+    test        r2d, r2d ; top_right
     jz .fix_tr_1
     jmp .body
 .fix_lt_2:
@@ -1075,7 +1075,7 @@ cglobal pred8x8l_top_dc_8, 4,4
     psllq       mm5, 56
     psrlq       mm5, 56
     pxor        mm2, mm5
-    test        R2d, R2d ; top_right
+    test        r2d, r2d ; top_right
     jnz .body
 .fix_tr_1:
     movq        mm5, mm3
@@ -1151,7 +1151,7 @@ cglobal pred8x8l_dc_8, 4,5
     psllq       mm5, 56
     psrlq       mm5, 56
     pxor        mm2, mm5
-    test        R2d, R2d
+    test        r2d, r2d
     jnz .body
 .fix_tr_1:
     movq        mm5, mm3
@@ -1177,7 +1177,7 @@ cglobal pred8x8l_dc_8, 4,5
     PALIGNR     mm1, mm4, 1, mm4
     test        r1d, r1d
     jz .fix_lt_2
-    test        R2d, R2d
+    test        r2d, r2d
     jz .fix_tr_1
 .body:
     lea          r1, [r0+r3*2]
@@ -1298,7 +1298,7 @@ cglobal pred8x8l_vertical_8, 4,4
     PALIGNR     mm1, mm4, 1, mm4
     test        r1d, r1d ; top_left
     jz .fix_lt_2
-    test        R2d, R2d ; top_right
+    test        r2d, r2d ; top_right
     jz .fix_tr_1
     jmp .body
 .fix_lt_2:
@@ -1307,7 +1307,7 @@ cglobal pred8x8l_vertical_8, 4,4
     psllq       mm5, 56
     psrlq       mm5, 56
     pxor        mm2, mm5
-    test        R2d, R2d ; top_right
+    test        r2d, r2d ; top_right
     jnz .body
 .fix_tr_1:
     movq        mm5, mm3
@@ -1349,7 +1349,7 @@ cglobal pred8x8l_down_left_8, 4,5
     PALIGNR     mm1, mm4, 1, mm4
     test        r1d, r1d
     jz .fix_lt_2
-    test        R2d, R2d
+    test        r2d, r2d
     jz .fix_tr_1
     jmp .do_top
 .fix_lt_2:
@@ -1358,7 +1358,7 @@ cglobal pred8x8l_down_left_8, 4,5
     psllq       mm5, 56
     psrlq       mm5, 56
     pxor        mm2, mm5
-    test        R2d, R2d
+    test        r2d, r2d
     jnz .do_top
 .fix_tr_1:
     movq        mm5, mm3
@@ -1374,7 +1374,7 @@ cglobal pred8x8l_down_left_8, 4,5
 .do_top:
     PRED4x4_LOWPASS mm4, mm2, mm1, mm3, mm5
     movq        mm7, mm4
-    test        R2d, R2d
+    test        r2d, r2d
     jz .fix_tr_2
     movq        mm0, [r0+8]
     movq        mm5, mm0
@@ -1457,7 +1457,7 @@ cglobal pred8x8l_down_left_8, 4,4
     PALIGNR     mm1, mm4, 1, mm4
     test        r1d, r1d ; top_left
     jz .fix_lt_2
-    test        R2d, R2d ; top_right
+    test        r2d, r2d ; top_right
     jz .fix_tr_1
     jmp .do_top
 .fix_lt_2:
@@ -1466,7 +1466,7 @@ cglobal pred8x8l_down_left_8, 4,4
     psllq       mm5, 56
     psrlq       mm5, 56
     pxor        mm2, mm5
-    test        R2d, R2d ; top_right
+    test        r2d, r2d ; top_right
     jnz .do_top
 .fix_tr_1:
     movq        mm5, mm3
@@ -1482,7 +1482,7 @@ cglobal pred8x8l_down_left_8, 4,4
 .do_top:
     PRED4x4_LOWPASS mm4, mm2, mm1, mm3, mm5
     movq2dq    xmm3, mm4
-    test        R2d, R2d ; top_right
+    test        r2d, r2d ; top_right
     jz .fix_tr_2
     movq        mm0, [r0+8]
     movq        mm5, mm0
@@ -1584,7 +1584,7 @@ cglobal pred8x8l_down_right_8, 4,5
     PALIGNR     mm1, mm4, 1, mm4
     test        r1d, r1d ; top_left
     jz .fix_lt_2
-    test        R2d, R2d ; top_right
+    test        r2d, r2d ; top_right
     jz .fix_tr_1
 .do_top:
     PRED4x4_LOWPASS mm4, mm2, mm1, mm3, mm5
@@ -1603,7 +1603,7 @@ cglobal pred8x8l_down_right_8, 4,5
     psllq       mm5, 56
     psrlq       mm5, 56
     pxor        mm2, mm5
-    test        R2d, R2d ; top_right
+    test        r2d, r2d ; top_right
     jnz .do_top
 .fix_tr_1:
     movq        mm5, mm3
@@ -1712,7 +1712,7 @@ cglobal pred8x8l_down_right_8, 4,5
     psllq       mm5, 56
     psrlq       mm5, 56
     pxor        mm2, mm5
-    test        R2d, R2d
+    test        r2d, r2d
     jnz .do_top
 .fix_tr_1:
     movq        mm5, mm3
@@ -1740,7 +1740,7 @@ cglobal pred8x8l_down_right_8, 4,5
     PALIGNR     mm1, mm4, 1, mm4
     test        r1d, r1d
     jz .fix_lt_2
-    test        R2d, R2d
+    test        r2d, r2d
     jz .fix_tr_1
 .do_top:
     PRED4x4_LOWPASS mm4, mm2, mm1, mm3, mm5
@@ -1832,7 +1832,7 @@ cglobal pred8x8l_vertical_right_8, 4,5
     psllq       mm5, 56
     psrlq       mm5, 56
     pxor        mm2, mm5
-    test        R2d, R2d
+    test        r2d, r2d
     jnz .do_top
 .fix_tr_1:
     movq        mm5, mm3
@@ -1854,7 +1854,7 @@ cglobal pred8x8l_vertical_right_8, 4,5
     PALIGNR     mm1, mm4, 1, mm4
     test        r1d, r1d
     jz .fix_lt_2
-    test        R2d, R2d
+    test        r2d, r2d
     jz .fix_tr_1
 .do_top:
     PRED4x4_LOWPASS mm6, mm2, mm1, mm3, mm5
@@ -1941,7 +1941,7 @@ cglobal pred8x8l_vertical_right_8, 4,5,7
     psllq       mm5, 56
     psrlq       mm5, 56
     pxor        mm2, mm5
-    test        R2d, R2d
+    test        r2d, r2d
     jnz .do_top
 .fix_tr_1:
     movq        mm5, mm3
@@ -1963,7 +1963,7 @@ cglobal pred8x8l_vertical_right_8, 4,5,7
     PALIGNR     mm1, mm4, 1, mm4
     test        r1d, r1d
     jz .fix_lt_2
-    test        R2d, R2d
+    test        r2d, r2d
     jz .fix_tr_1
 .do_top:
     PRED4x4_LOWPASS mm6, mm2, mm1, mm3, mm5
@@ -2030,7 +2030,7 @@ cglobal pred8x8l_vertical_left_8, 4,4
     PALIGNR     mm1, mm4, 1, mm4
     test        r1d, r1d
     jz .fix_lt_2
-    test        R2d, R2d
+    test        r2d, r2d
     jz .fix_tr_1
     jmp .do_top
 .fix_lt_2:
@@ -2039,7 +2039,7 @@ cglobal pred8x8l_vertical_left_8, 4,4
     psllq       mm5, 56
     psrlq       mm5, 56
     pxor        mm2, mm5
-    test        R2d, R2d
+    test        r2d, r2d
     jnz .do_top
 .fix_tr_1:
     movq        mm5, mm3
@@ -2055,7 +2055,7 @@ cglobal pred8x8l_vertical_left_8, 4,4
 .do_top:
     PRED4x4_LOWPASS mm4, mm2, mm1, mm3, mm5
     movq2dq    xmm4, mm4
-    test        R2d, R2d
+    test        r2d, r2d
     jz .fix_tr_2
     movq        mm0, [r0+8]
     movq        mm5, mm0
@@ -2237,7 +2237,7 @@ cglobal pred8x8l_horizontal_down_8, 4,5
     psllq       mm5, 56
     psrlq       mm5, 56
     pxor        mm2, mm5
-    test        R2d, R2d
+    test        r2d, r2d
     jnz .do_top
 .fix_tr_1:
     movq        mm5, mm3
@@ -2264,7 +2264,7 @@ cglobal pred8x8l_horizontal_down_8, 4,5
     PALIGNR     mm1, mm4, 1, mm4
     test        r1d, r1d
     jz .fix_lt_2
-    test        R2d, R2d
+    test        r2d, r2d
     jz .fix_tr_1
 .do_top:
     PRED4x4_LOWPASS mm4, mm2, mm1, mm3, mm5
@@ -2352,7 +2352,7 @@ cglobal pred8x8l_horizontal_down_8, 4,5
     psllq       mm5, 56
     psrlq       mm5, 56
     pxor        mm2, mm5
-    test        R2d, R2d
+    test        r2d, r2d
     jnz .do_top
 .fix_tr_1:
     movq        mm5, mm3
@@ -2385,12 +2385,12 @@ cglobal pred8x8l_horizontal_down_8, 4,5
     PALIGNR     mm1, mm4, 1, mm4
     test        r1d, r1d
     jz .fix_lt_2
-    test        R2d, R2d
+    test        r2d, r2d
     jz .fix_tr_1
 .do_top:
     PRED4x4_LOWPASS mm4, mm2, mm1, mm3, mm5
     movq2dq    xmm1, mm4
-    test        R2d, R2d
+    test        r2d, r2d
     jz .fix_tr_2
     movq        mm0, [r0+8]
     movq        mm5, mm0

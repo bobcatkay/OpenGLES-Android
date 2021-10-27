@@ -5,14 +5,10 @@
 #include "VideoDecoder.h"
 #include <queue>
 
-//char av_error[AV_ERROR_MAX_STRING_SIZE] = { 0 };
-//#define err2str(errnum)     av_make_error_string(av_error, AV_ERROR_MAX_STRING_SIZE, errnum)
-//#define INBUF_SIZE 4096
-
 static std::mutex sDecodeMtx;
-VideoDecoder::VideoDecoder(const char* fileName)
+VideoDecoder::VideoDecoder(int fd)
 {
-    GetAssetPath(mVideoPath, fileName);
+    sprintf(mVideoPath, "/proc/self/fd/%d", fd);
     LOGD("VideoDecoder, %s", mVideoPath);
 
     int width = 0, height = 0;
@@ -243,7 +239,7 @@ void VideoDecoder::SendFrame(std::function<void(AVFrame* frame)> decodeCallback,
                 //DEBUG
                 frameCount++;
                 if (GetNowMs() - frameCountStart >= 1000) {
-                    //LOGD("Play fps is %d\n", frameCount);
+                    LOGD("Play fps is %d\n", frameCount);
                     frameCountStart = GetNowMs();
                     frameCount = 0;
                 }
@@ -274,6 +270,9 @@ int VideoDecoder::FindVideoStream()
     //std::string fileName = std::string(mVideoPath);
     AVInputFormat* fmt = NULL;
     AVDictionary* dict = NULL;
+    av_register_all();
+    avcodec_register_all();
+    avformat_network_init();
     int code = avformat_open_input(&mFormatCtx, mVideoPath, fmt, &dict);
     if (code) {
         LOGE("FindVideoStream, avformat_open_input failed:%s\n", av_err2str(code));

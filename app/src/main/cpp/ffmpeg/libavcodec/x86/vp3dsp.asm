@@ -92,12 +92,12 @@ SECTION .text
 %endmacro
 
 %macro STORE_4_WORDS 1
-    movd         R2d, %1
+    movd         r2d, %1
     mov  [r0     -1], r2w
     psrlq         %1, 32
     shr           r2, 16
     mov  [r0+r1  -1], r2w
-    movd         R2d, %1
+    movd         r2d, %1
     mov  [r0+r1*2-1], r2w
     shr           r2, 16
     mov  [r0+r3  -1], r2w

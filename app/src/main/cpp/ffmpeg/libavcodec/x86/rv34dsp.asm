@@ -70,7 +70,7 @@ cglobal rv34_idct_dc_add, 3, 3
     ; calculate DC
     IDCT_DC_ROUND r2
     pxor       m1, m1
-    movd       m0, R2d
+    movd       m0, r2d
     psubw      m1, m0
     packuswb   m0, m0
     packuswb   m1, m1
@@ -176,7 +176,7 @@ cglobal rv34_idct_dc_add, 3, 3, 6
     pxor       m1, m1
 
     ; calculate DC
-    movd       m0, R2d
+    movd       m0, r2d
     lea        r2, [r0+r1*2]
     movd       m2, [r0]
     movd       m3, [r0+r1]

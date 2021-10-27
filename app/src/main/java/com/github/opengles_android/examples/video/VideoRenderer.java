@@ -1,14 +1,20 @@
 package com.github.opengles_android.examples.video;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
+import java.io.File;
 import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import androidx.annotation.NonNull;
 
@@ -26,6 +32,7 @@ public class VideoRenderer implements SurfaceHolder.Callback, Runnable {
     private int mSurfaceHeight;
     private boolean mbShutDown = false;
     private long mLastFrameTime = 0;
+    private int mVideoFileFD = 0;
 
     public VideoRenderer(Activity activity) {
         mActivity = activity;
@@ -46,7 +53,10 @@ public class VideoRenderer implements SurfaceHolder.Callback, Runnable {
 
         mSurfaceWidth = width;
         mSurfaceHeight = height;
-        mGLThread.start();
+
+        if (0 != mVideoFileFD) {
+            mGLThread.start();
+        }
     }
 
     @Override
@@ -56,10 +66,14 @@ public class VideoRenderer implements SurfaceHolder.Callback, Runnable {
         mbShutDown = true;
     }
 
+    public void setVideoFD(int fd) {
+        mVideoFileFD = fd;
+    }
+
     @Override
     public void run() {
-        initRenderer(mSurface, mSurfaceWidth, mSurfaceHeight, mActivity.getAssets());
-        initVideoDecoder();
+        initRenderer(mSurface, mSurfaceWidth, mSurfaceHeight, mActivity.getAssets(), mVideoFileFD);
+
         mLastFrameTime = System.currentTimeMillis();
 
         while (!mbShutDown) {
@@ -77,8 +91,7 @@ public class VideoRenderer implements SurfaceHolder.Callback, Runnable {
         release();
     }
 
-    private native void initRenderer(Surface surface, int surfaceWidth, int surfaceHeight, AssetManager assetManager);
+    private native void initRenderer(Surface surface, int surfaceWidth, int surfaceHeight, AssetManager assetManager, int videoFileFD);
     private native void onDrawFrame();
-    private native void initVideoDecoder();
     private native void release();
 }

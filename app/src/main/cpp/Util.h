@@ -25,6 +25,14 @@
 
 const EGLint IMAGE_KHR_ATTR[3] = {EGL_IMAGE_PRESERVED_KHR, EGL_TRUE, EGL_NONE};
 
+struct Texture {
+    GLuint id;
+    GLint location;
+    GLint width;
+    GLint height;
+    GLint format;
+};
+
 void InitUtil(JNIEnv* env, jobject assetManager);
 
 std::string ReadFileFromAssets(const char* fileName);
@@ -37,4 +45,5 @@ void InitContext(EGLDisplay& display, ANativeWindow* window, EGLSurface& surface
 
 void BindHardwareBuffer(GLuint texId, AHardwareBuffer* buffer, EGLDisplay& display);
 
+void GenTexture(Texture& texture);
 #endif

@@ -5,7 +5,6 @@
 #include "VideoRenderer.h"
 
 VideoRenderer* pRenderer;
-VideoDecoder *pDecoder;
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -14,10 +13,11 @@ Java_com_github_opengles_1android_examples_video_VideoRenderer_initRenderer(JNIE
                                                                             jobject surface,
                                                                             jint surface_width,
                                                                             jint surface_height,
-                                                                            jobject assetManager) {
+                                                                            jobject assetManager,
+                                                                            jint videoFileFD) {
     InitUtil(env, assetManager);
     ANativeWindow *window = ANativeWindow_fromSurface(env, surface);
-    pRenderer = new VideoRenderer(window, surface_width, surface_height);
+    pRenderer = new VideoRenderer(window, surface_width, surface_height, videoFileFD);
 }
 
 extern "C"
@@ -36,11 +36,4 @@ Java_com_github_opengles_1android_examples_video_VideoRenderer_release(JNIEnv *e
         pRenderer->Release();
         delete(pRenderer);
     }
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_github_opengles_1android_examples_video_VideoRenderer_initVideoDecoder(JNIEnv *env,
-                                                                                jobject thiz) {
-    pDecoder = new VideoDecoder("test.mp4");
 }

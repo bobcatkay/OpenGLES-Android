@@ -90,7 +90,7 @@ SECTION .text
 INIT_MMX mmx
 ; void ff_h264_idct_add_8_mmx(uint8_t *dst, int16_t *block, int stride)
 cglobal h264_idct_add_8, 3, 3, 0
-    movsxdifnidn r2, R2d
+    movsxdifnidn r2, r2d
     IDCT4_ADD    r0, r1, r2
     RET
 
@@ -210,7 +210,7 @@ cglobal h264_idct_add_8, 3, 3, 0
 INIT_MMX mmx
 ; void ff_h264_idct8_add_8_mmx(uint8_t *dst, int16_t *block, int stride)
 cglobal h264_idct8_add_8, 3, 4, 0
-    movsxdifnidn r2, R2d
+    movsxdifnidn r2, r2d
     %assign pad 128+4-(stack_offset&7)
     SUB         rsp, pad
 
@@ -279,7 +279,7 @@ cglobal h264_idct8_add_8, 3, 4, 0
 INIT_XMM sse2
 ; void ff_h264_idct8_add_8_sse2(uint8_t *dst, int16_t *block, int stride)
 cglobal h264_idct8_add_8, 3, 4, 10
-    movsxdifnidn  r2, R2d
+    movsxdifnidn  r2, r2d
     IDCT8_ADD_SSE r0, r1, r2, r3
     RET
 
@@ -318,7 +318,7 @@ INIT_MMX mmxext
 ; void ff_h264_idct_dc_add_8_mmxext(uint8_t *dst, int16_t *block, int stride)
 %if ARCH_X86_64
 cglobal h264_idct_dc_add_8, 3, 4, 0
-    movsxd       r2, R2d
+    movsxd       r2, r2d
     movsx        r3, word [r1]
     mov  dword [r1], 0
     DC_ADD_MMXEXT_INIT r3, r2
@@ -327,7 +327,7 @@ cglobal h264_idct_dc_add_8, 3, 4, 0
 
 ; void ff_h264_idct8_dc_add_8_mmxext(uint8_t *dst, int16_t *block, int stride)
 cglobal h264_idct8_dc_add_8, 3, 4, 0
-    movsxd       r2, R2d
+    movsxd       r2, r2d
     movsx        r3, word [r1]
     mov  dword [r1], 0
     DC_ADD_MMXEXT_INIT r3, r2

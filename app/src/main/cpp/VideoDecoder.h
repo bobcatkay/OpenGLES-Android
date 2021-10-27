@@ -26,7 +26,7 @@ class VideoDecoder
 {
 public:
     VideoDecoder() {};
-    VideoDecoder(const char* fileName);
+    VideoDecoder(int fd);
     void Start(std::function<void(AVFrame*)> decodeCallback);
     void Decode(std::function<void(AVFrame*)> decodeCallback);
     void SendFrame(std::function<void(AVFrame*)> decodeCallback,double);

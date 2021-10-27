@@ -55,7 +55,7 @@ SECTION .text
 
 %macro QPEL4_H_LOWPASS_OP 1
 cglobal %1_h264_qpel4_h_lowpass, 4,5 ; dst, src, dstStride, srcStride
-    movsxdifnidn  r2, R2d
+    movsxdifnidn  r2, r2d
     movsxdifnidn  r3, r3d
     pxor          m7, m7
     mova          m4, [pw_5]
@@ -98,7 +98,7 @@ QPEL4_H_LOWPASS_OP avg
 
 %macro QPEL8_H_LOWPASS_OP 1
 cglobal %1_h264_qpel8_h_lowpass, 4,5 ; dst, src, dstStride, srcStride
-    movsxdifnidn  r2, R2d
+    movsxdifnidn  r2, r2d
     movsxdifnidn  r3, r3d
     mov          r4d, 8
     pxor          m7, m7
@@ -158,7 +158,7 @@ QPEL8_H_LOWPASS_OP avg
 
 %macro QPEL8_H_LOWPASS_OP_XMM 1
 cglobal %1_h264_qpel8_h_lowpass, 4,5,8 ; dst, src, dstStride, srcStride
-    movsxdifnidn  r2, R2d
+    movsxdifnidn  r2, r2d
     movsxdifnidn  r3, r3d
     mov          r4d, 8
     pxor          m7, m7
@@ -382,7 +382,7 @@ QPEL8_H_LOWPASS_L2_OP_XMM avg
 
 %macro QPEL4_V_LOWPASS_OP 1
 cglobal %1_h264_qpel4_v_lowpass, 4,4 ; dst, src, dstStride, srcStride
-    movsxdifnidn  r2, R2d
+    movsxdifnidn  r2, r2d
     movsxdifnidn  r3, r3d
     sub           r1, r3
     sub           r1, r3
@@ -416,13 +416,13 @@ QPEL4_V_LOWPASS_OP avg
 %macro QPEL8OR16_V_LOWPASS_OP 1
 %if cpuflag(sse2)
 cglobal %1_h264_qpel8or16_v_lowpass, 5,5,8 ; dst, src, dstStride, srcStride, h
-    movsxdifnidn  r2, R2d
+    movsxdifnidn  r2, r2d
     movsxdifnidn  r3, r3d
     sub           r1, r3
     sub           r1, r3
 %else
 cglobal %1_h264_qpel8or16_v_lowpass_op, 5,5,8 ; dst, src, dstStride, srcStride, h
-    movsxdifnidn  r2, R2d
+    movsxdifnidn  r2, r2d
     movsxdifnidn  r3, r3d
 %endif
     pxor          m7, m7
@@ -491,7 +491,7 @@ QPEL8OR16_V_LOWPASS_OP avg
 
 %macro QPEL4_HV1_LOWPASS_OP 1
 cglobal %1_h264_qpel4_hv_lowpass_v, 3,3 ; src, tmp, srcStride
-    movsxdifnidn  r2, R2d
+    movsxdifnidn  r2, r2d
     pxor          m7, m7
     movh          m0, [r0]
     movh          m1, [r0+r2]
@@ -513,7 +513,7 @@ cglobal %1_h264_qpel4_hv_lowpass_v, 3,3 ; src, tmp, srcStride
     RET
 
 cglobal %1_h264_qpel4_hv_lowpass_h, 3,4 ; tmp, dst, dstStride
-    movsxdifnidn  r2, R2d
+    movsxdifnidn  r2, r2d
     mov          r3d, 4
 .loop:
     mova          m0, [r0]
@@ -544,7 +544,7 @@ QPEL4_HV1_LOWPASS_OP avg
 
 %macro QPEL8OR16_HV1_LOWPASS_OP 1
 cglobal %1_h264_qpel8or16_hv1_lowpass_op, 4,4,8 ; src, tmp, srcStride, size
-    movsxdifnidn  r2, R2d
+    movsxdifnidn  r2, r2d
     pxor          m7, m7
     movh          m0, [r0]
     movh          m1, [r0+r2]
@@ -593,7 +593,7 @@ QPEL8OR16_HV1_LOWPASS_OP put
 %macro QPEL8OR16_HV2_LOWPASS_OP 1
 ; unused is to match ssse3 and mmxext args
 cglobal %1_h264_qpel8or16_hv2_lowpass_op, 5,5 ; dst, tmp, dstStride, unused, h
-    movsxdifnidn  r2, R2d
+    movsxdifnidn  r2, r2d
 .loop:
     mova          m0, [r1]
     mova          m3, [r1+8]
@@ -636,7 +636,7 @@ QPEL8OR16_HV2_LOWPASS_OP avg
 
 %macro QPEL8OR16_HV2_LOWPASS_OP_XMM 1
 cglobal %1_h264_qpel8or16_hv2_lowpass, 5,5,8 ; dst, tmp, dstStride, tmpStride, size
-    movsxdifnidn  r2, R2d
+    movsxdifnidn  r2, r2d
     movsxdifnidn  r3, r3d
     cmp          r4d, 16
     je         .op16
