@@ -32,8 +32,8 @@ SECTION .text
 
 ; %1 = aligned/unaligned
 %macro BSWAP_LOOPS  1
-    mov      r3d, r2d
-    sar      r2d, 3
+    mov      r3d, R2d
+    sar      R2d, 3
     jz       .left4_%1
 .loop8_%1:
     mov%1    m0, [r1 +  0]
@@ -61,10 +61,10 @@ SECTION .text
 %endif
     add      r0, 32
     add      r1, 32
-    dec      r2d
+    dec      R2d
     jnz      .loop8_%1
 .left4_%1:
-    mov      r2d, r3d
+    mov      R2d, r3d
     test     r3d, 4
     jz       .left
     mov%1    m0, [r1]
@@ -103,7 +103,7 @@ cglobal bswap32_buf, 3,4,5
     BSWAP_LOOPS  a
 .left:
 %if cpuflag(ssse3)
-    test     r2d, 2
+    test     R2d, 2
     jz       .left1
     movq     m0, [r1]
     pshufb   m0, m2
@@ -111,13 +111,13 @@ cglobal bswap32_buf, 3,4,5
     add      r1, 8
     add      r0, 8
 .left1:
-    test     r2d, 1
+    test     R2d, 1
     jz       .end
-    mov      r2d, [r1]
-    bswap    r2d
-    mov      [r0], r2d
+    mov      R2d, [r1]
+    bswap    R2d
+    mov      [r0], R2d
 %else
-    and      r2d, 3
+    and      R2d, 3
     jz       .end
 .loop2:
     mov      r3d, [r1]
@@ -125,7 +125,7 @@ cglobal bswap32_buf, 3,4,5
     mov      [r0], r3d
     add      r1, 4
     add      r0, 4
-    dec      r2d
+    dec      R2d
     jnz      .loop2
 %endif
 .end:

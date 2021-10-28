@@ -267,12 +267,10 @@ void VideoDecoder::GetVideoSize(int& width, int& height)
 
 int VideoDecoder::FindVideoStream()
 {
-    //std::string fileName = std::string(mVideoPath);
     AVInputFormat* fmt = NULL;
     AVDictionary* dict = NULL;
     av_register_all();
     avcodec_register_all();
-    avformat_network_init();
     int code = avformat_open_input(&mFormatCtx, mVideoPath, fmt, &dict);
     if (code) {
         LOGE("FindVideoStream, avformat_open_input failed:%s\n", av_err2str(code));

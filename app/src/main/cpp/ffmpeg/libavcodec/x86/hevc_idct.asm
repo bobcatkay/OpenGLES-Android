@@ -724,54 +724,54 @@ cglobal hevc_idct_transpose_32x32, 0, 0, 0
 
     TRANSPOSE_BLOCK 0, 0, 64 ; M1
     mov r1d, 7
-    mov r2d, 7 * 256
+    mov R2d, 7 * 256
 .loop_transpose:
     SWAP_BLOCKS 0, r2, 64, 0, r1 * 8
-    sub r2d, 256
+    sub R2d, 256
     dec r1d
     jg .loop_transpose
 
     TRANSPOSE_BLOCK 8, 256, 64 ; M9
     mov r1d, 6
-    mov r2d, 512
+    mov R2d, 512
     mov r3d, 16
 .loop_transpose2:
     SWAP_BLOCKS 8, r2, 64, 256, r3
     add r3d, 8
-    add r2d, 256
+    add R2d, 256
     dec r1d
     jg .loop_transpose2
 
     TRANSPOSE_BLOCK 2 * 8, 2 * 256, 64 ; M9
     mov r1d, 5
-    mov r2d, 768
+    mov R2d, 768
     mov r3d, 24
 .loop_transpose3:
     SWAP_BLOCKS 2 * 8, r2, 64, 2 * 256, r3
     add r3d, 8
-    add r2d, 256
+    add R2d, 256
     dec r1d
     jg .loop_transpose3
 
     TRANSPOSE_BLOCK 3 * 8, 3 * 256, 64 ; M27
     mov r1d, 4
-    mov r2d, 1024
+    mov R2d, 1024
     mov r3d, 32
 .loop_transpose4:
     SWAP_BLOCKS 3 * 8, r2, 64, 3 * 256, r3
     add r3d, 8
-    add r2d, 256
+    add R2d, 256
     dec r1d
     jg .loop_transpose4
 
     TRANSPOSE_BLOCK 4 * 8, 4 * 256, 64 ; M36
     mov r1d, 3
-    mov r2d, 1280
+    mov R2d, 1280
     mov r3d, 40
 .loop_transpose5:
     SWAP_BLOCKS 4 * 8, r2, 64, 4 * 256, r3
     add r3d, 8
-    add r2d, 256
+    add R2d, 256
     dec r1d
     jg .loop_transpose5
 

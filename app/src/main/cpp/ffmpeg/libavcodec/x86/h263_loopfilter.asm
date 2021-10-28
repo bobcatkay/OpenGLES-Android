@@ -104,7 +104,7 @@ INIT_MMX mmx
 ; void ff_h263_v_loop_filter_mmx(uint8_t *src, int stride, int qscale)
 cglobal h263_v_loop_filter, 3,5
     movsxdifnidn r1, r1d
-    movsxdifnidn r2, r2d
+    movsxdifnidn r2, R2d
 
     lea          r4, [h263_loop_filter_strength]
     movzx       r3d, BYTE [r4+r2]
@@ -115,7 +115,7 @@ cglobal h263_v_loop_filter, 3,5
     sub          r3, r1
     mov          r4, r3
     sub          r4, r1
-    H263_LOOP_FILTER r4, r3, r0, r0+r1, r2d
+    H263_LOOP_FILTER r4, r3, r0, r0+r1, R2d
 
     mova       [r3], m3
     mova       [r0], m4
@@ -146,7 +146,7 @@ cglobal h263_v_loop_filter, 3,5
 INIT_MMX mmx
 cglobal h263_h_loop_filter, 3,5,0,32
     movsxdifnidn r1, r1d
-    movsxdifnidn r2, r2d
+    movsxdifnidn r2, R2d
 
     lea          r4, [h263_loop_filter_strength]
     movzx       r3d, BYTE [r4+r2]
@@ -160,7 +160,7 @@ cglobal h263_h_loop_filter, 3,5,0,32
     lea          r4, [r0+r1*4]
     TRANSPOSE4X4 r4, rsp+4
 
-    H263_LOOP_FILTER rsp, rsp+8, rsp+16, rsp+24, r2d
+    H263_LOOP_FILTER rsp, rsp+8, rsp+16, rsp+24, R2d
 
     mova         m1, m5
     mova         m0, m4

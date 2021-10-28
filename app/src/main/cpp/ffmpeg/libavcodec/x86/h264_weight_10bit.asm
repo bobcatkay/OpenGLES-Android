@@ -44,7 +44,7 @@ SECTION .text
     PROLOGUE 0,6,8
     movifnidn  r0, r0mp
     movifnidn r1d, r1m
-    movifnidn r2d, r2m
+    movifnidn R2d, r2m
     movifnidn r4d, r4m
     movifnidn r5d, r5m
 %endmacro
@@ -99,7 +99,7 @@ cglobal h264_weight_16_10
     WEIGHT_OP 16
     mova [r0+16], m5
     add       r0, r1
-    dec       r2d
+    dec       R2d
     jnz .nextrow
     REP_RET
 %endmacro
@@ -118,7 +118,7 @@ cglobal h264_weight_8_10
     WEIGHT_OP   0
     mova     [r0], m5
     add        r0, r1
-    dec        r2d
+    dec        R2d
     jnz .nextrow
     REP_RET
 %endmacro
@@ -132,7 +132,7 @@ WEIGHT_FUNC_MM
 %macro WEIGHT_FUNC_HALF_MM 0
 cglobal h264_weight_4_10
     WEIGHT_PROLOGUE
-    sar         r2d, 1
+    sar         R2d, 1
     WEIGHT_SETUP
     lea         r3, [r1*2]
 .nextrow:
@@ -140,7 +140,7 @@ cglobal h264_weight_4_10
     movh      [r0], m5
     movhps [r0+r1], m5
     add         r0, r3
-    dec         r2d
+    dec         R2d
     jnz .nextrow
     REP_RET
 %endmacro
@@ -167,7 +167,7 @@ DECLARE_REG_TMP 7
     PROLOGUE 0,8,8
     movifnidn  r0, r0mp
     movifnidn  r1, r1mp
-    movifnidn r2d, r2m
+    movifnidn R2d, r2m
     movifnidn r5d, r5m
     movifnidn r6d, r6m
     movifnidn t0d, r7m

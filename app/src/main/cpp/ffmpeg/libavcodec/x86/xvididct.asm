@@ -639,7 +639,7 @@ SECTION .text
 %macro IDCT_SSE2 1 ; 0=normal  1=put  2=add
 %if %1 == 0 || ARCH_X86_32
     %define GPR0  r1d
-    %define GPR1  r2d
+    %define GPR1  R2d
     %define GPR2  r3d
     %define GPR3  r4d
     %define NUM_GPRS 5

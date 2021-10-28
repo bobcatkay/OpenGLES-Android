@@ -161,9 +161,9 @@ cglobal deblock_v_luma_10, 5,5,8*(mmsize/16)
     %define am  [rsp+mmsize*3]
     %define bm  [rsp+mmsize*4]
     SUB        rsp, pad
-    shl        r2d, 2
+    shl        R2d, 2
     shl        r3d, 2
-    LOAD_AB     m4, m5, r2d, r3d
+    LOAD_AB     m4, m5, R2d, r3d
     mov         r3, 32/mmsize
     mov         r2, r0
     sub         r0, r1
@@ -218,9 +218,9 @@ cglobal deblock_h_luma_10, 5,6,8*(mmsize/16)
     %define am  [rsp+mmsize*5]
     %define bm  [rsp+mmsize*6]
     SUB        rsp, pad
-    shl        r2d, 2
+    shl        R2d, 2
     shl        r3d, 2
-    LOAD_AB     m4, m5, r2d, r3d
+    LOAD_AB     m4, m5, R2d, r3d
     mov         r3, r1
     mova        am, m4
     add         r3, r1
@@ -347,9 +347,9 @@ cglobal deblock_v_luma_10, 5,5,15
     %define mask0 m7
     %define mask1 m10
     %define mask2 m11
-    shl        r2d, 2
+    shl        R2d, 2
     shl        r3d, 2
-    LOAD_AB    m12, m13, r2d, r3d
+    LOAD_AB    m12, m13, R2d, r3d
     mov         r2, r0
     sub         r0, r1
     sub         r0, r1
@@ -375,9 +375,9 @@ cglobal deblock_v_luma_10, 5,5,15
     REP_RET
 
 cglobal deblock_h_luma_10, 5,7,15
-    shl        r2d, 2
+    shl        R2d, 2
     shl        r3d, 2
-    LOAD_AB    m12, m13, r2d, r3d
+    LOAD_AB    m12, m13, R2d, r3d
     mov         r2, r1
     add         r2, r1
     add         r2, r1
@@ -497,7 +497,7 @@ DEBLOCK_LUMA_64
 
 ; in: %1-%3=tmp, %4=p2, %5=q2
 %macro LUMA_INTRA_INTER 5
-    LOAD_AB t0, t1, r2d, r3d
+    LOAD_AB t0, t1, R2d, r3d
     mova    %1, t0
     LOAD_MASK m0, m1, m2, m3, %1, t1, t0, t2, t3
 %if ARCH_X86_64
@@ -621,9 +621,9 @@ cglobal deblock_v_luma_intra_10, 4,7,16
     add     r4, r0     ; pix-4*stride
     mov     r6, 2
     mova    m0, [pw_2]
-    shl    r2d, 2
+    shl    R2d, 2
     shl    r3d, 2
-    LOAD_AB aa, bb, r2d, r3d
+    LOAD_AB aa, bb, R2d, r3d
 .loop:
     mova    p2, [r4+r1]
     mova    p1, [r4+2*r1]
@@ -674,7 +674,7 @@ cglobal deblock_h_luma_intra_10, 4,7,16
     add     r4, r0     ; pix+4*stride
     mov     r6, 2
     mova    m0, [pw_2]
-    shl    r2d, 2
+    shl    R2d, 2
     shl    r3d, 2
 .loop:
     movu    q3, [r0-8]
@@ -687,7 +687,7 @@ cglobal deblock_h_luma_intra_10, 4,7,16
     movu    p3, [r4+r5-8]
     TRANSPOSE8x8W 5, 8, 9, 10, 11, 12, 13, 4, 1
 
-    LOAD_AB m1, m2, r2d, r3d
+    LOAD_AB m1, m2, R2d, r3d
     LOAD_MASK q1, q0, p0, p1, m1, m2, m3, t0, t1
     psrlw   m1, 2
     paddw   m1, m0 ; alpha/4+2
@@ -734,7 +734,7 @@ cglobal deblock_v_luma_intra_10, 4,7,8*(mmsize/16)
     neg     r4
     add     r4, r0
     mov     r6, 32/mmsize
-    shl    r2d, 2
+    shl    R2d, 2
     shl    r3d, 2
 .loop:
     mova    m0, [r4+r1*2] ; p1
@@ -767,7 +767,7 @@ cglobal deblock_h_luma_intra_10, 4,7,8*(mmsize/16)
     add     r4, r0     ; pix+4*stride
     mov     r6, 32/mmsize
 %endif
-    shl    r2d, 2
+    shl    R2d, 2
     shl    r3d, 2
 .loop:
     LUMA_H_INTRA_LOAD
@@ -936,14 +936,14 @@ cglobal deblock_v_chroma_10, 5,7-(mmsize/16),8*(mmsize/16)
     mov         r5, r0
     sub         r0, r1
     sub         r0, r1
-    shl        r2d, 2
+    shl        R2d, 2
     shl        r3d, 2
 %if mmsize < 16
     mov         r6, 16/mmsize
 .loop:
 %endif
     CHROMA_V_LOAD r5
-    LOAD_AB     m4, m5, r2d, r3d
+    LOAD_AB     m4, m5, R2d, r3d
     LOAD_MASK   m0, m1, m2, m3, m4, m5, m7, m6, m4
     pxor        m4, m4
     CHROMA_V_LOAD_TC m6, r4
@@ -971,14 +971,14 @@ cglobal deblock_v_chroma_intra_10, 4,6-(mmsize/16),8*(mmsize/16)
     mov         r4, r0
     sub         r0, r1
     sub         r0, r1
-    shl        r2d, 2
+    shl        R2d, 2
     shl        r3d, 2
 %if mmsize < 16
     mov         r5, 16/mmsize
 .loop:
 %endif
     CHROMA_V_LOAD r4
-    LOAD_AB     m4, m5, r2d, r3d
+    LOAD_AB     m4, m5, R2d, r3d
     LOAD_MASK   m0, m1, m2, m3, m4, m5, m7, m6, m4
     CHROMA_DEBLOCK_P0_Q0_INTRA m1, m2, m0, m3, m7, m5, m6
     CHROMA_V_STORE

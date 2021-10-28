@@ -171,9 +171,12 @@ void BindHardwareBuffer(GLuint texId, AHardwareBuffer* buffer, EGLDisplay& displ
 
 void GenTexture(Texture& texture) {
     glGenTextures(1, &texture.id);
+    glActiveTexture(GL_TEXTURE0 + texture.location);
     glBindTexture(GL_TEXTURE_2D, texture.id);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexImage2D(GL_TEXTURE_2D,0,texture.format,texture.width, texture.height,0,texture.format,GL_UNSIGNED_BYTE,NULL);
     glBindTexture(GL_TEXTURE_2D, 0);
 }

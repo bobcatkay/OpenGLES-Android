@@ -314,7 +314,7 @@ cglobal pred8x8_vertical_10, 2, 2
 ;-----------------------------------------------------------------------------
 INIT_XMM sse2
 cglobal pred8x8_horizontal_10, 2, 3
-    mov         r2d, 4
+    mov         R2d, 4
 .loop:
     movq         m0, [r0+r1*0-8]
     movq         m1, [r0+r1*1-8]
@@ -325,7 +325,7 @@ cglobal pred8x8_horizontal_10, 2, 3
     mova  [r0+r1*0], m0
     mova  [r0+r1*1], m1
     lea          r0, [r0+r1*2]
-    dec          r2d
+    dec          R2d
     jg .loop
     REP_RET
 
@@ -364,23 +364,23 @@ cglobal pred8x8_dc_10, 2, 6
 
     lea         r5, [r1*3]
     lea         r4, [r0+r1*4]
-    movzx      r2d, word [r0+r1*1-2]
+    movzx      R2d, word [r0+r1*1-2]
     movzx      r3d, word [r0+r1*2-2]
-    add        r2d, r3d
+    add        R2d, r3d
     movzx      r3d, word [r0+r5*1-2]
-    add        r2d, r3d
+    add        R2d, r3d
     movzx      r3d, word [r4-2]
-    add        r2d, r3d
-    movd        m2, r2d            ; s2
+    add        R2d, r3d
+    movd        m2, R2d            ; s2
 
-    movzx      r2d, word [r4+r1*1-2]
+    movzx      R2d, word [r4+r1*1-2]
     movzx      r3d, word [r4+r1*2-2]
-    add        r2d, r3d
+    add        R2d, r3d
     movzx      r3d, word [r4+r5*1-2]
-    add        r2d, r3d
+    add        R2d, r3d
     movzx      r3d, word [r4+r1*4-2]
-    add        r2d, r3d
-    movd        m3, r2d            ; s3
+    add        R2d, r3d
+    movd        m3, R2d            ; s3
 
     punpcklwd   m2, m3
     punpckldq   m0, m2            ; s0, s1, s2, s3
@@ -491,7 +491,7 @@ cglobal pred8x8_plane_10, 2, 7, 7
     pmullw    m2, [pw_m32101234]   ; b
     pmullw    m5, m4, [pw_m3]      ; c
     paddw     m5, [pw_16]
-    mov      r2d, 8
+    mov      R2d, 8
     add       r0, r1
 .loop:
     paddsw    m6, m2, m5
@@ -501,7 +501,7 @@ cglobal pred8x8_plane_10, 2, 7, 7
     mova    [r0], m6
     paddw     m5, m4
     add       r0, r1
-    dec r2d
+    dec R2d
     jg .loop
     REP_RET
 
@@ -540,7 +540,7 @@ cglobal pred8x8l_top_dc_10, 4, 4, 6
     sub         r0, r3
     mova        m0, [r0]
     shr        r1d, 14
-    shr        r2d, 13
+    shr        R2d, 13
     neg         r1
     pslldq      m1, m0, 2
     psrldq      m2, m0, 2
@@ -594,7 +594,7 @@ cglobal pred8x8l_dc_10, 4, 6, 6
     punpckhqdq  m3, m1
     mova        m0, [r0]
     shr        r1d, 14
-    shr        r2d, 13
+    shr        R2d, 13
     neg         r1
     pslldq      m1, m0, 2
     psrldq      m2, m0, 2
@@ -640,7 +640,7 @@ cglobal pred8x8l_vertical_10, 4, 4, 6
     sub         r0, r3
     mova        m0, [r0]
     shr        r1d, 14
-    shr        r2d, 13
+    shr        R2d, 13
     neg         r1
     pslldq      m1, m0, 2
     psrldq      m2, m0, 2
@@ -734,13 +734,13 @@ cglobal pred8x8l_down_left_10, 4, 4, 7
     mova        m3, [r0]
     shr        r1d, 14
     neg         r1
-    shr        r2d, 13
+    shr        R2d, 13
     pslldq      m1, m3, 2
     psrldq      m2, m3, 2
     pinsrw      m1, [r0+r1], 0
     pinsrw      m2, [r0+r2+14], 7
     PRED4x4_LOWPASS m6, m2, m1, m3
-    jz .fix_tr ; flags from shr r2d
+    jz .fix_tr ; flags from shr R2d
     mova        m1, [r0+16]
     psrldq      m5, m1, 2
     PALIGNR     m2, m1, m3, 14, m3
@@ -824,7 +824,7 @@ cglobal pred8x8l_down_right_10, 4, 5, 8
     PRED4x4_LOWPASS m6, m1, m4, m3
     PRED4x4_LOWPASS m4, m3, m0, m4
     mova        m3, [r0]
-    shr        r2d, 13
+    shr        R2d, 13
     pslldq      m1, m3, 2
     psrldq      m2, m3, 2
     pinsrw      m1, [r0-2], 0
@@ -895,7 +895,7 @@ cglobal pred8x8l_vertical_right_10, 4, 5, 7
     PALIGNR     m1, m3,  2, m2
     PRED4x4_LOWPASS m3, m1, m4, m3
     mova        m2, [r0]
-    shr        r2d, 13
+    shr        R2d, 13
     pslldq      m1, m2, 2
     psrldq      m5, m2, 2
     pinsrw      m1, [r0-2], 0
@@ -1017,7 +1017,7 @@ PRED8x8L_HORIZONTAL_UP
 %macro PRED16x16_VERTICAL 0
 cglobal pred16x16_vertical_10, 2, 3
     sub   r0, r1
-    mov  r2d, 8
+    mov  R2d, 8
     mova  m0, [r0+ 0]
     mova  m1, [r0+mmsize]
 %if mmsize==8
@@ -1028,7 +1028,7 @@ cglobal pred16x16_vertical_10, 2, 3
     MOV16 r0+r1*1, m0, m1, m2, m3
     MOV16 r0+r1*2, m0, m1, m2, m3
     lea   r0, [r0+r1*2]
-    dec   r2d
+    dec   R2d
     jg .loop
     REP_RET
 %endmacro
@@ -1043,7 +1043,7 @@ PRED16x16_VERTICAL
 ;-----------------------------------------------------------------------------
 %macro PRED16x16_HORIZONTAL 0
 cglobal pred16x16_horizontal_10, 2, 3
-    mov   r2d, 8
+    mov   R2d, 8
 .vloop:
     movd   m0, [r0+r1*0-4]
     movd   m1, [r0+r1*1-4]
@@ -1052,7 +1052,7 @@ cglobal pred16x16_horizontal_10, 2, 3
     MOV16  r0+r1*0, m0, m0, m0, m0
     MOV16  r0+r1*1, m1, m1, m1, m1
     lea    r0, [r0+r1*2]
-    dec    r2d
+    dec    R2d
     jg .vloop
     REP_RET
 %endmacro
@@ -1082,10 +1082,10 @@ cglobal pred16x16_dc_10, 2, 6
     movzx     r4d, word [r0+r1]
 %rep 7
     lea        r0, [r0+r1*2]
-    movzx     r2d, word [r0]
-    add       r3d, r2d
-    movzx     r2d, word [r0+r1]
-    add       r4d, r2d
+    movzx     R2d, word [r0]
+    add       r3d, R2d
+    movzx     R2d, word [r0+r1]
+    add       r4d, R2d
 %endrep
     lea       r3d, [r3+r4+16]
 
@@ -1125,12 +1125,12 @@ cglobal pred16x16_top_dc_10, 2, 3
     SPLATW     m0, m0
     paddw      m0, [pw_8]
     psrlw      m0, 4
-    mov       r2d, 8
+    mov       R2d, 8
 .loop:
     MOV16 r0+r1*1, m0, m0, m0, m0
     MOV16 r0+r1*2, m0, m0, m0, m0
     lea        r0, [r0+r1*2]
-    dec       r2d
+    dec       R2d
     jg .loop
     REP_RET
 %endmacro
@@ -1152,10 +1152,10 @@ cglobal pred16x16_left_dc_10, 2, 6
     movzx     r4d, word [r0+r1]
 %rep 7
     lea        r0, [r0+r1*2]
-    movzx     r2d, word [r0]
-    add       r3d, r2d
-    movzx     r2d, word [r0+r1]
-    add       r4d, r2d
+    movzx     R2d, word [r0]
+    add       r3d, R2d
+    movzx     R2d, word [r0+r1]
+    add       r4d, R2d
 %endrep
     lea       r3d, [r3+r4+8]
     shr       r3d, 4
@@ -1183,12 +1183,12 @@ PRED16x16_LEFT_DC
 %macro PRED16x16_128_DC 0
 cglobal pred16x16_128_dc_10, 2,3
     mova       m0, [pw_512]
-    mov       r2d, 8
+    mov       R2d, 8
 .loop:
     MOV16 r0+r1*0, m0, m0, m0, m0
     MOV16 r0+r1*1, m0, m0, m0, m0
     lea        r0, [r0+r1*2]
-    dec       r2d
+    dec       R2d
     jg .loop
     REP_RET
 %endmacro

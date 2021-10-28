@@ -205,7 +205,7 @@ cglobal %2_to_%1_%3, 3, 3, 6, dst, src, len
 %macro PACK_6CH 8
 cglobal pack_6ch_%2_to_%1_%3, 2, 8, %6, dst, src, src1, src2, src3, src4, src5, len
 %if ARCH_X86_64
-    mov     lend, r2d
+    mov     lend, R2d
 %else
     %define lend dword r2m
 %endif
@@ -308,7 +308,7 @@ pack_6ch_%2_to_%1_u_int %+ SUFFIX:
 %macro UNPACK_6CH 8
 cglobal unpack_6ch_%2_to_%1_%3, 2, 8, %6, dst, src, dst1, dst2, dst3, dst4, dst5, len
 %if ARCH_X86_64
-    mov     lend, r2d
+    mov     lend, R2d
 %else
     %define lend dword r2m
 %endif

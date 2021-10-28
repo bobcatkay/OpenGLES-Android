@@ -38,7 +38,7 @@ void VideoRenderer::Init() {
 void VideoRenderer::OnDrawFrame() {
     glViewport(0, 0, mWindowWidth, mWindowHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(1.0f,1.0f,0.0f,1.0f);
+    glClearColor(0.0f,0.0f,0.0f,1.0f);
 
     pShader->UseProgram();
     pShader->SetMat4("uProjection", mProjectionMatrix);
@@ -120,19 +120,24 @@ void VideoRenderer::UpdateTexture() {
     }
 
     sMutex.lock();
+    LOGD("UpdateTexture, mTexture[0].width: %d, mFrame->width: %d", mTexture[0].width, mFrame->width);
     if (!mTexture[0].id || mTexture[0].width != mFrame->width) {
         sMutex.unlock();
         return;
     }
 
-    if (mFrame->format == AV_PIX_FMT_YUV420P) {
+    LOGD("UpdateTexture, format: %d, AV_PIX_FMT_YUV420P: %d, AV_PIX_FMT_YUVJ420P: %d",
+         mFrame->format, AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUVJ420P);
+
+    if ((mFrame->format == AV_PIX_FMT_YUV420P) || (mFrame->format == AV_PIX_FMT_YUVJ420P)) {
         for (int i = 0; i < 3; i++) {
             Texture &tex = mTexture[i];
             glActiveTexture(GL_TEXTURE0 + tex.location);
             glBindTexture(GL_TEXTURE_2D, tex.id);
-            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tex.width, tex.height, tex.format, GL_UNSIGNED_BYTE, mFrame->data[i]);
+            uint8_t *pixels = mFrame->data[i];
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tex.width, tex.height, tex.format, GL_UNSIGNED_BYTE, pixels);
 
-            LOGD("UpdateTexture, texture{id: %d, location: %d, with: %d, height: %d}, data size: %lu", tex.id, tex.location, tex.width, tex.height, sizeof(mFrame->data[i]));
+            LOGD("UpdateTexture, texture{id: %d, location: %d, with: %d, height: %d}", tex.id, tex.location, tex.width, tex.height);
         }
     }
 
@@ -148,9 +153,11 @@ void VideoRenderer::InitYUVTexture() {
         return;
     }
 
-    mTexture[0] = {0, 0, mVideoWidth, mVideoHeight, GL_RED};
-    mTexture[1] = {0, 1, mVideoWidth / 2, mVideoHeight / 2, GL_RED};
-    mTexture[2] = {0, 2, mVideoWidth / 2, mVideoHeight / 2, GL_RED};
+    glDisable(GL_BLEND);
+    mTexture[0] = {0, 0, mVideoWidth, mVideoHeight, GL_LUMINANCE};
+    mTexture[1] = {0, 1, mVideoWidth / 2, mVideoHeight / 2, GL_LUMINANCE};
+    mTexture[2] = {0, 2, mVideoWidth / 2, mVideoHeight / 2, GL_LUMINANCE};
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     GenTexture(mTexture[0]);
     GenTexture(mTexture[1]);
     GenTexture(mTexture[2]);
