@@ -13,6 +13,7 @@ import com.github.opengles_android.R;
 import com.github.opengles_android.common.FullScreenActivity;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import androidx.annotation.Nullable;
 
@@ -43,13 +44,16 @@ public class VideoActivity extends FullScreenActivity {
             Uri selectedVideo = data.getData();
             try {
                 ParcelFileDescriptor fileDescriptor = getContentResolver().openFileDescriptor(selectedVideo, "r");
-                int fd = fileDescriptor.getFd();
-                mVideoRenderer.setVideoFD(fd);
+                //int fd = fileDescriptor.getFd();
+                mVideoRenderer.setVideoFD(fileDescriptor);
+                //fileDescriptor.close();
 
-                Log.d(TAG, "onActivityResult, fd: " + fd);
-            } catch (FileNotFoundException e) {
+                Log.d(TAG, "onActivityResult, fd: " + fileDescriptor.getFd());
+            } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else {
+            finish();
         }
     }
 }

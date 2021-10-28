@@ -32,7 +32,7 @@ public class VideoRenderer implements SurfaceHolder.Callback, Runnable {
     private int mSurfaceHeight;
     private boolean mbShutDown = false;
     private long mLastFrameTime = 0;
-    private int mVideoFileFD = 0;
+    private ParcelFileDescriptor mVideoFileFD = null;
 
     public VideoRenderer(Activity activity) {
         mActivity = activity;
@@ -54,7 +54,7 @@ public class VideoRenderer implements SurfaceHolder.Callback, Runnable {
         mSurfaceWidth = width;
         mSurfaceHeight = height;
 
-        if (0 != mVideoFileFD) {
+        if (null != mVideoFileFD) {
             mGLThread.start();
         }
     }
@@ -66,13 +66,13 @@ public class VideoRenderer implements SurfaceHolder.Callback, Runnable {
         mbShutDown = true;
     }
 
-    public void setVideoFD(int fd) {
+    public void setVideoFD(ParcelFileDescriptor fd) {
         mVideoFileFD = fd;
     }
 
     @Override
     public void run() {
-        initRenderer(mSurface, mSurfaceWidth, mSurfaceHeight, mActivity.getAssets(), mVideoFileFD);
+        initRenderer(mSurface, mSurfaceWidth, mSurfaceHeight, mActivity.getAssets(), mVideoFileFD.getFd());
 
         mLastFrameTime = System.currentTimeMillis();
 
@@ -89,6 +89,12 @@ public class VideoRenderer implements SurfaceHolder.Callback, Runnable {
         Log.e(TAG, "run, exit.");
 
         release();
+
+        try {
+            mVideoFileFD.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private native void initRenderer(Surface surface, int surfaceWidth, int surfaceHeight, AssetManager assetManager, int videoFileFD);

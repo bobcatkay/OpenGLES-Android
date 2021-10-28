@@ -34,6 +34,6 @@ JNIEXPORT void JNICALL
 Java_com_github_opengles_1android_examples_video_VideoRenderer_release(JNIEnv *env, jobject thiz) {
     if (nullptr != pRenderer) {
         pRenderer->Release();
-        delete(pRenderer);
+        //delete(pRenderer);
     }
 }

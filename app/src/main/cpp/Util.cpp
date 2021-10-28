@@ -57,10 +57,10 @@ std::string ReadFileFromAssets(const char* fileName) {
 void InitQuadVAO(GLuint& vao) {
     float vertices[] = {
             // positions           // texture coords
-            1.0f,  1.0f, 0.0f,     1.0f, 1.0f, // top right
-            1.0f, -1.0f, 0.0f,     1.0f, 0.0f, // bottom right
-            -1.0f, -1.0f, 0.0f,    0.0f, 0.0f, // bottom left
-            -1.0f,  1.0f, 0.0f,    0.0f, 1.0f  // top left
+            1.0f,  1.0f, 0.0f,     1.0f, 0.0f, // top right
+            1.0f, -1.0f, 0.0f,     1.0f, 1.0f, // bottom right
+            -1.0f, -1.0f, 0.0f,    0.0f, 1.0f, // bottom left
+            -1.0f,  1.0f, 0.0f,    0.0f, 0.0f  // top left
     };
     unsigned int indices[] = {
             0, 1, 3, // first triangle
@@ -169,14 +169,14 @@ void BindHardwareBuffer(GLuint texId, AHardwareBuffer* buffer, EGLDisplay& displ
     glEGLImageTargetTexture2DOES(GL_TEXTURE_EXTERNAL_OES, image);
 }
 
-void GenTexture(Texture& texture) {
-    glGenTextures(1, &texture.id);
-    glActiveTexture(GL_TEXTURE0 + texture.location);
-    glBindTexture(GL_TEXTURE_2D, texture.id);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D,0,texture.format,texture.width, texture.height,0,texture.format,GL_UNSIGNED_BYTE,NULL);
-    glBindTexture(GL_TEXTURE_2D, 0);
-}
+//void GenTexture(Texture& texture) {
+//    glGenTextures(1, &texture.id);
+//    glActiveTexture(GL_TEXTURE0 + texture.location);
+//    glBindTexture(GL_TEXTURE_2D, texture.id);
+//    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//    glTexImage2D(GL_TEXTURE_2D,0,texture.format,texture.width, texture.height,0,texture.format,GL_UNSIGNED_BYTE,NULL);
+//    glBindTexture(GL_TEXTURE_2D, 0);
+//}

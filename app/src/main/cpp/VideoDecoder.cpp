@@ -4,8 +4,8 @@
 
 #include "VideoDecoder.h"
 #include <queue>
-
 static std::mutex sDecodeMtx;
+
 VideoDecoder::VideoDecoder(int fd)
 {
     sprintf(mVideoPath, "/proc/self/fd/%d", fd);
@@ -51,8 +51,7 @@ int VideoDecoder::DecoderInit(AVCodec* codec, AVCodecContext*& vc, int vs)
 
 void VideoDecoder::Decode(std::function<void(AVFrame* frame)> decodeCallback)
 {
-    AVCodec* vCodec = NULL;
-    AVCodecContext* vc = NULL;
+    AVCodec* vCodec = nullptr;
 
     int code = 0;
     int vs;
@@ -76,20 +75,15 @@ void VideoDecoder::Decode(std::function<void(AVFrame* frame)> decodeCallback)
         return;
     }
 
-    AVCodecParameters* codecpar = mFormatCtx->streams[vs]->codecpar;
-    mVideoWidth = codecpar->width;
-    mVideoHeight = codecpar->height;
-
     int fps = round(R2d(mFormatCtx->streams[vs]->avg_frame_rate));
     LOGD("Decode, FPS: %d.", fps);
 
-    code = DecoderInit(vCodec, vc, vs);
+    code = DecoderInit(vCodec, pCodecContext, vs);
 
     if (code) {
         LOGE("Decode, Failed to open video decoder! %s ", av_err2str(code));
         return;
     }
-
 
     //Read frames
     AVPacket* pkt = av_packet_alloc();
@@ -103,10 +97,8 @@ void VideoDecoder::Decode(std::function<void(AVFrame* frame)> decodeCallback)
     int maxCacheFrames = 5;
 
     AVFrame* frame = av_frame_alloc();
-    AVFrame* swFrame = av_frame_alloc();
     AVFrame* tempFrame = NULL;
-    uint8_t* buffer = NULL;
-    int size;
+
     for (;;) {
         if (!bRun) {
             LOGE("Decode, Decoder Exit.\n");
@@ -132,7 +124,7 @@ void VideoDecoder::Decode(std::function<void(AVFrame* frame)> decodeCallback)
         }
 
 
-        code = avcodec_send_packet(vc, pkt);
+        code = avcodec_send_packet(pCodecContext, pkt);
         if (code) {
             LOGE("Decode, Error during decoding\n");
             break;
@@ -140,16 +132,11 @@ void VideoDecoder::Decode(std::function<void(AVFrame* frame)> decodeCallback)
         //clear
         av_packet_unref(pkt);
 
-//        if (code) {
-//            LOGE("avcodec_send_packet failed!\n");
-//            continue;
-//        }
-
         for (;;) {
             if (!bRun) {
                 break;
             }
-            code = avcodec_receive_frame(vc, frame);
+            code = avcodec_receive_frame(pCodecContext, frame);
             if (code) {
                 //LOGD("avcodec_receive_frame failed!\n");
                 break;
@@ -172,13 +159,12 @@ void VideoDecoder::Decode(std::function<void(AVFrame* frame)> decodeCallback)
 
     }
     av_frame_free(&frame);
-    av_frame_free(&swFrame);
 
     av_packet_free(&pkt);
-    avcodec_free_context(&vc);
-    av_buffer_unref(&mHwDeviceCtx);
-    Clear();
     FreeCacheFrames();
+    avformat_close_input(&mFormatCtx);
+    avcodec_close(pCodecContext);
+    avcodec_free_context(&pCodecContext);
 }
 
 void VideoDecoder::SendFrame(std::function<void(AVFrame* frame)> decodeCallback,double tb)
@@ -262,7 +248,7 @@ void VideoDecoder::GetVideoSize(int& width, int& height)
     AVCodecParameters* codecpar = mFormatCtx->streams[vs]->codecpar;
     width = codecpar->width;
     height = codecpar->height;
-    Clear();
+    avformat_close_input(&mFormatCtx);
 }
 
 int VideoDecoder::FindVideoStream()
@@ -294,6 +280,7 @@ int VideoDecoder::FindVideoStream()
         LOGE("FindVideoStream, find video stream failed!\n");
         return -1;
     }
+
     return vs;
 }
 
@@ -306,11 +293,6 @@ void VideoDecoder::Shutdown()
 void VideoDecoder::Pause()
 {
     bPause = !bPause;
-}
-
-void VideoDecoder::Clear()
-{
-    avformat_close_input(&mFormatCtx);
 }
 
 void VideoDecoder::FreeCacheFrames()

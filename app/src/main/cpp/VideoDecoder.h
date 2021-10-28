@@ -34,22 +34,18 @@ public:
     int FindVideoStream();
     void Pause();
     void Shutdown();
-    void Clear();
 private:
-    AVFormatContext* mFormatCtx = NULL;
+    AVFormatContext* mFormatCtx = nullptr;
+    AVCodecContext* pCodecContext = nullptr;
+
     char mVideoPath[128];
-    int mVideoWidth, mVideoHeight;
     double mCurPts = 0;
     bool bRun = true;
     bool bPause = false;
 
     std::list<AVFrame*> mCachedFrames;
-    std::vector<AVFrame*> mFramesQue;
     int mCacheSize = 0;
-    bool bReplay = false;
     struct timespec currentTime;
-
-    AVBufferRef* mHwDeviceCtx = NULL;
 
     int DecoderInit(AVCodec* codec, AVCodecContext*& vc, int vs);
     void FreeCacheFrames();

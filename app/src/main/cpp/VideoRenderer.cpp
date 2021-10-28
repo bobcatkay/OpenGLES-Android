@@ -3,7 +3,6 @@
 //
 
 #include "VideoRenderer.h"
-
 static std::mutex sMutex;
 
 VideoRenderer::VideoRenderer(ANativeWindow *window, int surfaceWidth, int surfaceHeight, int videoFileFD) {
@@ -38,13 +37,19 @@ void VideoRenderer::Init() {
 void VideoRenderer::OnDrawFrame() {
     glViewport(0, 0, mWindowWidth, mWindowHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0f,0.0f,0.0f,1.0f);
+    glClearColor(1.0f,1.0f,1.0f,1.0f);
 
     pShader->UseProgram();
     pShader->SetMat4("uProjection", mProjectionMatrix);
     pShader->SetMat4("uTransform", mTransformMatrix);
 
     UpdateTexture();
+
+    for (int i=0; i<3; i++) {
+        if (mTexture[i]) {
+            mTexture[i]->ActiveTexture();
+        }
+    }
 
     glBindVertexArray(mVAO);
     glDrawElements(GL_TRIANGLES, VERTEX_COUNT, GL_UNSIGNED_INT, 0);
@@ -53,6 +58,11 @@ void VideoRenderer::OnDrawFrame() {
 }
 
 void VideoRenderer::Release() {
+    if (nullptr != pVideoDecoder) {
+        pVideoDecoder->Shutdown();
+        //delete(pVideoDecoder);
+    }
+
     eglDestroySurface(mDisplay, mEglSurface);
     eglDestroyContext(mDisplay, mContext);
     ANativeWindow_release(pWindow);
@@ -65,15 +75,8 @@ void VideoRenderer::Release() {
 }
 
 void VideoRenderer::FreeResources() {
-    if (pVideoDecoder) {
-        pVideoDecoder->Shutdown();
-        delete(pVideoDecoder);
-    }
-
     for (int i = 0; i < 3;i++) {
-        if (mTexture[i].id) {
-            glDeleteTextures(1, &mTexture[i].id);
-        }
+        delete(mTexture[i]);
     }
 
     glDeleteBuffers(1, &mVAO);
@@ -96,48 +99,47 @@ void VideoRenderer::StartDecoder(int videoFileFD) {
 
 void VideoRenderer::VideoDecodeCallback(AVFrame *frame) {
     LOGD("VideoDecodeCallback");
-    std::lock_guard<std::mutex> lock(sMutex);
+    sMutex.lock();
     if (!mFrame) {
+        sMutex.unlock();
         return;
     }
 
     if (frame->width != mVideoWidth) {
+        sMutex.unlock();
         return;
     }
 
     av_frame_unref(mFrame);
     av_frame_move_ref(mFrame, frame);
+    sMutex.unlock();
     LOGD("VideoDecodeCallback, Exit.");
 }
 
 void VideoRenderer::UpdateTexture() {
-    LOGD("UpdateTexture");
+    LOGD("UpdateTexture, mVideoWidth: %d, mVideoHeight: %d", mVideoWidth, mVideoHeight);
+
     if (!mVideoWidth){
         return;
     }
-    if (!mTexture[0].id) {
+
+    if (!mTexture[0]) {
         InitYUVTexture();
     }
 
     sMutex.lock();
-    LOGD("UpdateTexture, mTexture[0].width: %d, mFrame->width: %d", mTexture[0].width, mFrame->width);
-    if (!mTexture[0].id || mTexture[0].width != mFrame->width) {
+    if (!mTexture[0] || mTexture[0]->width != mFrame->width) {
         sMutex.unlock();
         return;
     }
 
-    LOGD("UpdateTexture, format: %d, AV_PIX_FMT_YUV420P: %d, AV_PIX_FMT_YUVJ420P: %d",
-         mFrame->format, AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUVJ420P);
+    LOGD("UpdateTexture, format: %d", mFrame->format);
 
-    if ((mFrame->format == AV_PIX_FMT_YUV420P) || (mFrame->format == AV_PIX_FMT_YUVJ420P)) {
+    if (mFrame->format >= 0) {
         for (int i = 0; i < 3; i++) {
-            Texture &tex = mTexture[i];
-            glActiveTexture(GL_TEXTURE0 + tex.location);
-            glBindTexture(GL_TEXTURE_2D, tex.id);
-            uint8_t *pixels = mFrame->data[i];
-            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, tex.width, tex.height, tex.format, GL_UNSIGNED_BYTE, pixels);
+            mTexture[i]->UpdateData(mFrame->data[i]);
 
-            LOGD("UpdateTexture, texture{id: %d, location: %d, with: %d, height: %d}", tex.id, tex.location, tex.width, tex.height);
+            LOGD("UpdateTexture, textures: %s", mTexture[i]->ToString());
         }
     }
 
@@ -148,23 +150,32 @@ void VideoRenderer::UpdateTexture() {
 void VideoRenderer::InitYUVTexture() {
     LOGD("InitYUVTexture");
     std::lock_guard<std::mutex> lock(sMutex);
-    int fmt = mFrame->format;
-    if (!mFrame || fmt < 0) {
+    if (!mFrame || !mVideoWidth) {
         return;
     }
 
-    glDisable(GL_BLEND);
-    mTexture[0] = {0, 0, mVideoWidth, mVideoHeight, GL_LUMINANCE};
-    mTexture[1] = {0, 1, mVideoWidth / 2, mVideoHeight / 2, GL_LUMINANCE};
-    mTexture[2] = {0, 2, mVideoWidth / 2, mVideoHeight / 2, GL_LUMINANCE};
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    GenTexture(mTexture[0]);
-    GenTexture(mTexture[1]);
-    GenTexture(mTexture[2]);
+    mTexture[0] = Texture::GenSingleChannelTexture(mVideoWidth, mVideoHeight, 1);
+    mTexture[1] = Texture::GenSingleChannelTexture(mVideoWidth / 2, mVideoHeight / 2, 2);
+    mTexture[2] = Texture::GenSingleChannelTexture(mVideoWidth / 2, mVideoHeight / 2, 3);
 
     pShader->UseProgram();
-    pShader->SetInt("yTex", mTexture[0].location);
-    pShader->SetInt("uTex", mTexture[1].location);
-    pShader->SetInt("vTex", mTexture[2].location);
-    LOGD("InitYUVTexture, textres: [%d, %d, %d]", mTexture[0].id, mTexture[1].id, mTexture[2].id);
+    pShader->SetInt("yTex", mTexture[0]->location);
+    pShader->SetInt("uTex", mTexture[1]->location);
+    pShader->SetInt("vTex", mTexture[2]->location);
+    LOGD("InitYUVTexture, textures: [%s, %s, %s]", mTexture[0]->ToString(), mTexture[1]->ToString(), mTexture[2]->ToString());
+
+    mTransformMatrix = glm::mat4(1.0f);
+    float scaleY = 1.0f;
+    float scaleX = 1.0f;
+
+    if (mWindowHeight > mWindowWidth) {
+        scaleY = (float) mVideoHeight / mVideoWidth;
+    } else {
+        scaleX = (float) mVideoWidth / mVideoHeight;
+    }
+
+    LOGD("UpdateTexture, mWindowWidth: %d, mWindowHeight: %d, mVideoWidth: %d, mVideoHeight: %d, scaleX: %.1f, scaleY: %.1f.",
+         mWindowWidth, mWindowHeight, mVideoWidth, mVideoHeight, scaleX, scaleY);
+
+    mTransformMatrix = glm::scale(mTransformMatrix, glm::vec3(scaleX, scaleY, 1.0f));
 }

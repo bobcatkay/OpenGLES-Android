@@ -13,11 +13,12 @@ CameraRenderer::CameraRenderer(ANativeWindow *window, int surfaceWidth, int surf
 }
 
 void CameraRenderer::Init() {
+    mProjectionMatrix = glm::mat4(1.0f);
     float aspectRatio = mWindowWidth > mWindowHeight ?
                         (float) mWindowWidth / (float) mWindowHeight :
                         (float) mWindowHeight / (float) mWindowWidth;
 
-    if (mWindowWidth < mWindowHeight) {
+    if (mWindowWidth > mWindowHeight) {
         mProjectionMatrix = glm::ortho(-aspectRatio, aspectRatio, -1.0f, 1.0f, -1.0f, 1.0f);
     } else {
         mProjectionMatrix = glm::ortho(-1.0f, 1.0f, -aspectRatio, aspectRatio, -1.0f, 1.0f);
@@ -60,7 +61,7 @@ void CameraRenderer::UpdateTexture(AHardwareBuffer* buffer, int width, int heigh
         mTransformMatrix = glm::rotate(mTransformMatrix, glm::radians(270.0f), glm::vec3(0, 0, 1.0f));
 
         // Left-Right mirror
-        mTransformMatrix = glm::scale(mTransformMatrix, glm::vec3(1.0f, -1.0f, 1.0f));
+        //mTransformMatrix = glm::scale(mTransformMatrix, glm::vec3(1.0f, -1.0f, 1.0f));
     }
 
     if (nullptr != pLastBuffer) {

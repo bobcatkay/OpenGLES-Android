@@ -6,7 +6,7 @@
 
 #include <android/native_window_jni.h>
 #include "Shader.h"
-#include "Util.h"
+#include "Texture.h"
 #include "VideoDecoder.h"
 
 class VideoRenderer {
@@ -31,11 +31,11 @@ private:
     GLuint mVAO;
     glm::mat4 mProjectionMatrix = glm::mat4(1.0f);
     glm::mat4 mTransformMatrix = glm::mat4(1.0f);
-    Texture mTexture[3];
+    Texture* mTexture[3] = {0};
     VideoDecoder* pVideoDecoder;
     AVFrame* mFrame;
-    int mVideoWidth;
-    int mVideoHeight;
+    int mVideoWidth {0};
+    int mVideoHeight {0};
     bool bVideoSizeInit = false;
 
     void Init();

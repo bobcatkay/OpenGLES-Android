@@ -82,7 +82,7 @@ target_link_libraries( # Specifies the target library.
 
 add_library(video_renderer
         SHARED
-        VideoRendererJni.cpp VideoRenderer.cpp Shader.cpp Util.cpp VideoDecoder.cpp)
+        VideoRendererJni.cpp VideoRenderer.cpp Shader.cpp Util.cpp VideoDecoder.cpp Texture.cpp)
 
 target_link_libraries( # Specifies the target library.
         video_renderer

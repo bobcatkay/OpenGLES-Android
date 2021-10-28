@@ -25,13 +25,24 @@
 
 const EGLint IMAGE_KHR_ATTR[3] = {EGL_IMAGE_PRESERVED_KHR, EGL_TRUE, EGL_NONE};
 
-struct Texture {
-    GLuint id;
-    GLint location;
-    GLint width;
-    GLint height;
-    GLint format;
-};
+//struct Texture {
+//
+//    GLuint id;
+//    GLint location;
+//    GLint width;
+//    GLint height;
+//    GLint format;
+//
+//    const char* ToString() {
+//        char mPrintString[128];
+//        sprintf(mPrintString, "{id: %d, location: %d, width: %d, height: %d, format: %d}", id, location, width, height, format);
+//
+//        return mPrintString;
+//    }
+//
+////private:
+////    char mPrintString[128];
+//};
 
 void InitUtil(JNIEnv* env, jobject assetManager);
 
@@ -45,5 +56,5 @@ void InitContext(EGLDisplay& display, ANativeWindow* window, EGLSurface& surface
 
 void BindHardwareBuffer(GLuint texId, AHardwareBuffer* buffer, EGLDisplay& display);
 
-void GenTexture(Texture& texture);
+//void GenTexture(Texture& texture);
 #endif
