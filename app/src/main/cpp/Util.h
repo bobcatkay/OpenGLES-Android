@@ -50,11 +50,12 @@ std::string ReadFileFromAssets(const char* fileName);
 
 void GetAssetPath(char path[], const char* fileName);
 
+uint8_t* ReadDataFromAssets(const char* fileName, int& size);
+
 void InitQuadVAO(GLuint& vao);
 
 void InitContext(EGLDisplay& display, ANativeWindow* window, EGLSurface& surface, EGLContext& context);
 
 void BindHardwareBuffer(GLuint texId, AHardwareBuffer* buffer, EGLDisplay& display);
 
-//void GenTexture(Texture& texture);
 #endif

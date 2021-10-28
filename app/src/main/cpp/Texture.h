@@ -19,7 +19,7 @@ public:
 
     Texture();
     ~Texture();
-    static Texture* GenSingleChannelTexture(int width, int height, int location = 0);
+    static Texture* GenSingleChannelTexture(int width, int height, const void *pixels, int location = 0);
     void ActiveTexture();
     void UpdateData(uint8_t* pixels);
 

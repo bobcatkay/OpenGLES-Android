@@ -9,17 +9,11 @@
 #include <functional>
 #include "Util.h"
 #include <mutex>
-#include <list>
-#include <vector>
 #include <chrono>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
-#include <libavutil/imgutils.h>
-#include <libavutil/pixdesc.h>
-#include <libavutil/hwcontext.h>
-#include <libavutil/opt.h>
 }
 
 class VideoDecoder
@@ -29,26 +23,17 @@ public:
     VideoDecoder(int fd);
     void Start(std::function<void(AVFrame*)> decodeCallback);
     void Decode(std::function<void(AVFrame*)> decodeCallback);
-    void SendFrame(std::function<void(AVFrame*)> decodeCallback,double);
-    void GetVideoSize(int& width, int& height);
-    int FindVideoStream();
-    void Pause();
     void Shutdown();
 private:
     AVFormatContext* mFormatCtx = nullptr;
     AVCodecContext* pCodecContext = nullptr;
 
     char mVideoPath[128];
-    double mCurPts = 0;
-    bool bRun = true;
-    bool bPause = false;
 
-    std::list<AVFrame*> mCachedFrames;
-    int mCacheSize = 0;
+    bool bRun = true;
     struct timespec currentTime;
 
     int DecoderInit(AVCodec* codec, AVCodecContext*& vc, int vs);
-    void FreeCacheFrames();
 
     double R2d(AVRational r) {
         return r.num == 0 || r.den == 0 ? 0 : (double)r.num / (double)r.den;

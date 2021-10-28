@@ -11,7 +11,7 @@ VideoRenderer::VideoRenderer(ANativeWindow *window, int surfaceWidth, int surfac
     mWindowHeight = surfaceHeight;
 
     Init();
-    StartDecoder(videoFileFD);
+    //StartDecoder(videoFileFD);
 }
 
 void VideoRenderer::Init() {
@@ -32,6 +32,34 @@ void VideoRenderer::Init() {
     pShader = new Shader(vertexCode.c_str(), fragCode.c_str());
 
     InitQuadVAO(mVAO);
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    pShader->UseProgram();
+    int width = 1920;
+    int height = 1080;
+
+
+    int size = 0;
+    uint8_t *data = ReadDataFromAssets("test.yuv", size);
+    LOGD("VideoRenderer::Init, size: %d", size);
+    int yDataSize = width * height;
+    int uDataSize = yDataSize / 4;
+    int vDataSize = yDataSize / 4;
+    uint8_t* yData = new uint8_t[yDataSize];
+    uint8_t* uData = new uint8_t[uDataSize];
+    uint8_t* vData = new uint8_t[vDataSize];
+
+    memcpy(yData, &data[0], yDataSize);
+    memcpy(uData, &data[yDataSize], uDataSize);
+    memcpy(vData, &data[yDataSize + uDataSize], vDataSize);
+
+    mTexture[0] = Texture::GenSingleChannelTexture(width, height, yData, 0);
+    mTexture[1] = Texture::GenSingleChannelTexture(width / 2, height / 2, uData, 1);
+    mTexture[2] = Texture::GenSingleChannelTexture(width / 2, height / 2, vData, 2);
+    pShader->SetInt("yTex", mTexture[0]->location);
+    pShader->SetInt("uTex", mTexture[1]->location);
+    pShader->SetInt("vTex", mTexture[2]->location);
+    pShader->SetMat3("uBT709Matrix", MATRIX_BT709);
 }
 
 void VideoRenderer::OnDrawFrame() {
@@ -43,7 +71,7 @@ void VideoRenderer::OnDrawFrame() {
     pShader->SetMat4("uProjection", mProjectionMatrix);
     pShader->SetMat4("uTransform", mTransformMatrix);
 
-    UpdateTexture();
+    //UpdateTexture();
 
     for (int i=0; i<3; i++) {
         if (mTexture[i]) {
@@ -88,11 +116,11 @@ void VideoRenderer::StartDecoder(int videoFileFD) {
         mFrame = av_frame_alloc();
     }
     //创建视频解码器
-    pVideoDecoder = new VideoDecoder(videoFileFD);
-    pVideoDecoder->GetVideoSize(mVideoWidth, mVideoHeight);
-    bVideoSizeInit = true;
-    auto callback = std::bind(&VideoRenderer::VideoDecodeCallback,this,std::placeholders::_1);
-    pVideoDecoder->Start(callback);
+//    pVideoDecoder = new VideoDecoder(videoFileFD);
+//    pVideoDecoder->GetVideoSize(mVideoWidth, mVideoHeight);
+//    bVideoSizeInit = true;
+//    auto callback = std::bind(&VideoRenderer::VideoDecodeCallback,this,std::placeholders::_1);
+//    pVideoDecoder->Start(callback);
 
     LOGD("StartDecoder, mVideoWidht: %d, mVideoHeight: %d", mVideoWidth, mVideoHeight);
 }
@@ -154,9 +182,9 @@ void VideoRenderer::InitYUVTexture() {
         return;
     }
 
-    mTexture[0] = Texture::GenSingleChannelTexture(mVideoWidth, mVideoHeight, 1);
-    mTexture[1] = Texture::GenSingleChannelTexture(mVideoWidth / 2, mVideoHeight / 2, 2);
-    mTexture[2] = Texture::GenSingleChannelTexture(mVideoWidth / 2, mVideoHeight / 2, 3);
+    mTexture[0] = Texture::GenSingleChannelTexture(mVideoWidth, mVideoHeight, nullptr, 1);
+    mTexture[1] = Texture::GenSingleChannelTexture(mVideoWidth / 2, mVideoHeight / 2, nullptr, 2);
+    mTexture[2] = Texture::GenSingleChannelTexture(mVideoWidth / 2, mVideoHeight / 2, nullptr, 3);
 
     pShader->UseProgram();
     pShader->SetInt("yTex", mTexture[0]->location);

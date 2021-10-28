@@ -23,11 +23,21 @@ void Shader::SetMat4(const std::string& name, const glm::mat4& mat) {
     }
 }
 
+void Shader::SetMat3(const std::string &name, const float *value) {
+    GLint location = GetUniformLocation(name);
+
+    if (location != -1) {
+        glUniformMatrix3fv(location, 1, GL_FALSE, value);
+    }
+}
+
 void Shader::SetInt(const std::string& name, int value) {
     GLint location = GetUniformLocation(name);
 
     if (location > 0) {
         glUniform1i(location, value);
+
+        LOGD("Shader::SetInt, name: %s, location: %d, value: %d", name.c_str(), location, value);
     }
 }
 

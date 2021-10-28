@@ -32,8 +32,8 @@ public class VideoActivity extends FullScreenActivity {
         mVideoRenderer = new VideoRenderer(this);
         cameraView.getHolder().addCallback(mVideoRenderer);
 
-        Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(i, PICK_VIDEO_REQUEST);
+        //Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+        //startActivityForResult(i, PICK_VIDEO_REQUEST);
     }
 
     @Override

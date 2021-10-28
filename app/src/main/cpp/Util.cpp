@@ -18,6 +18,18 @@ void GetAssetPath(char path[], const char* fileName) {
     AAsset_close(asset);
 }
 
+uint8_t* ReadDataFromAssets(const char* fileName, int& size) {
+    
+    AAsset *pAsset = AAssetManager_open(pAssetManager, fileName, AASSET_MODE_RANDOM);
+    size = AAsset_getLength(pAsset);
+    LOGD("ReadDataFromAssets, size: %d", size);
+    uint8_t *buf = new uint8_t[size];
+    int ret = AAsset_read(pAsset, buf, size);
+    AAsset_close(pAsset);
+    LOGD("ReadDataFromAssets, ret: %d", ret);
+    return buf;
+}
+
 std::string ReadFileFromAssets(const char* fileName) {
     LOGD("ReadFileFromAssets, file: %s.", fileName);
 
@@ -168,15 +180,3 @@ void BindHardwareBuffer(GLuint texId, AHardwareBuffer* buffer, EGLDisplay& displ
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, texId);
     glEGLImageTargetTexture2DOES(GL_TEXTURE_EXTERNAL_OES, image);
 }
-
-//void GenTexture(Texture& texture) {
-//    glGenTextures(1, &texture.id);
-//    glActiveTexture(GL_TEXTURE0 + texture.location);
-//    glBindTexture(GL_TEXTURE_2D, texture.id);
-//    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-//    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-//    glTexImage2D(GL_TEXTURE_2D,0,texture.format,texture.width, texture.height,0,texture.format,GL_UNSIGNED_BYTE,NULL);
-//    glBindTexture(GL_TEXTURE_2D, 0);
-//}

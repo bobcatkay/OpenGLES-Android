@@ -89,7 +89,6 @@ target_link_libraries( # Specifies the target library.
         glm_shared
         libffmpeg
         GLESv3
-        GLESv2
         EGL
         android
 

@@ -20,6 +20,7 @@ public:
 
     void UseProgram();
     void SetMat4(const std::string& name, const glm::mat4& mat);
+    void SetMat3(const std::string& name, const float* value);
     void SetInt(const std::string& name, int value);
     GLuint GetProgram() {return mProgram;}
 
