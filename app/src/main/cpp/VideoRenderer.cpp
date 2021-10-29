@@ -35,8 +35,8 @@ void VideoRenderer::Init() {
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     pShader->UseProgram();
-    int width = 1920;
-    int height = 1080;
+    int width = 1080;
+    int height = 1920;
 
 
     int size = 0;
@@ -56,10 +56,30 @@ void VideoRenderer::Init() {
     mTexture[0] = Texture::GenSingleChannelTexture(width, height, yData, 0);
     mTexture[1] = Texture::GenSingleChannelTexture(width / 2, height / 2, uData, 1);
     mTexture[2] = Texture::GenSingleChannelTexture(width / 2, height / 2, vData, 2);
+
+//    mTexture[0]->UpdateData(yData);
+//    mTexture[1]->UpdateData(uData);
+//    mTexture[2]->UpdateData(vData);
+    delete[](data);
+    delete[](yData);
+    delete[](uData);
+    delete[](vData);
+
     pShader->SetInt("yTex", mTexture[0]->location);
     pShader->SetInt("uTex", mTexture[1]->location);
     pShader->SetInt("vTex", mTexture[2]->location);
-    pShader->SetMat3("uBT709Matrix", MATRIX_BT709);
+
+    mTransformMatrix = glm::mat4(1.0f);
+    float scaleY = 1.0f;
+    float scaleX = 1.0f;
+
+    if (mWindowHeight > mWindowWidth) {
+        scaleY = (float) height / width;
+    } else {
+        scaleX = (float) width / height;
+    }
+
+    mTransformMatrix = glm::scale(mTransformMatrix, glm::vec3(scaleX, scaleY, 1.0f));
 }
 
 void VideoRenderer::OnDrawFrame() {

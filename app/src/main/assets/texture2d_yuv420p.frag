@@ -5,14 +5,8 @@ precision highp float;
 uniform sampler2D yTex;
 uniform sampler2D uTex;
 uniform sampler2D vTex;
-uniform mat3 uBT709Matrix;
 in vec2 vTexCoords;
 out vec4 FragColor;
-
-//const mat3 CONVERT_MAT = mat3(1.0,     1.0,         1.0,
-//                              0.0,     -0.39465,    2.03211,
-//                              1.13983, -0.58060,    0.0);
-
 
 const mat3 CONVERT_MAT = mat3(
                             1.164f, 1.164f, 1.164f,
@@ -27,9 +21,7 @@ void main()
     yuv.r = texture(yTex,vTexCoords).r - 0.0625;
     yuv.g = texture(uTex,vTexCoords).r - 0.5;
     yuv.b = texture(vTex,vTexCoords).r - 0.5;
-    rgb = uBT709Matrix*yuv;
+    rgb = CONVERT_MAT*yuv;
 
-//    yuv.r = 0.0;
-//    yuv.g = 0.0;
     FragColor = vec4(rgb, 1.0);
 }

@@ -20,11 +20,6 @@ public:
 
 private:
     const GLuint VERTEX_COUNT = 6;
-    const GLfloat MATRIX_BT709[9] = {
-            1.164,  1.164,  1.164,
-            0.0,   -0.213,  2.112,
-            1.793, -0.533,  0.0,
-    };
 
     Shader* pShader;
     ANativeWindow* pWindow;
