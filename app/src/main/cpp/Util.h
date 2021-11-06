@@ -18,31 +18,11 @@
 #include <android/asset_manager_jni.h>
 #include <android/hardware_buffer.h>
 #include <android/hardware_buffer_jni.h>
-#include <media/NdkImageReader.h>
 
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, "camera_renderer", __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "camera_renderer", __VA_ARGS__)
 
 const EGLint IMAGE_KHR_ATTR[3] = {EGL_IMAGE_PRESERVED_KHR, EGL_TRUE, EGL_NONE};
-
-//struct Texture {
-//
-//    GLuint id;
-//    GLint location;
-//    GLint width;
-//    GLint height;
-//    GLint format;
-//
-//    const char* ToString() {
-//        char mPrintString[128];
-//        sprintf(mPrintString, "{id: %d, location: %d, width: %d, height: %d, format: %d}", id, location, width, height, format);
-//
-//        return mPrintString;
-//    }
-//
-////private:
-////    char mPrintString[128];
-//};
 
 void InitUtil(JNIEnv* env, jobject assetManager);
 

@@ -32,8 +32,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.OpenGLESAndroid.Fullscreen" />
         <activity
-            android:name=".examples.video.VideoActivity"
-            android:screenOrientation="portrait"
+            android:name=".examples.yuv.YUVActivity"
             android:theme="@style/Theme.OpenGLESAndroid.Fullscreen" />
     </application>
 
@@ -41,7 +40,6 @@
         android:glEsVersion="0x00030000"
         android:required="true" />
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.CAMERA" />
 
 </manifest>

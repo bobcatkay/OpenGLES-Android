@@ -1,5 +1,5 @@
 //
-// Created by 80325837 on 2021/10/28.
+// Created by xulinkai on 2021/10/28.
 //
 
 #ifndef OPENGLES_ANDROID_TEXTURE_H

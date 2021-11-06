@@ -1,8 +1,6 @@
 package com.github.opengles_android;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 
@@ -11,15 +9,11 @@ import com.github.opengles_android.examples.bitmap.BitmapActivity;
 import com.github.opengles_android.examples.camera.CameraActivity;
 import com.github.opengles_android.examples.native_render.NativeRenderActivity;
 import com.github.opengles_android.examples.triangle.TriangleActivity;
-import com.github.opengles_android.examples.video.VideoActivity;
+import com.github.opengles_android.examples.yuv.YUVActivity;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
-    private final static int CODE_REQUEST_WRITE_EXTERNAL = 0x100;
-
     private ActivityMainBinding binding;
 
     @Override
@@ -34,20 +28,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         binding.buttonNativeRender.setOnClickListener(this);
         binding.buttonCamera.setOnClickListener(this);
         binding.buttonVideo.setOnClickListener(this);
-
-        checkPermission();
-    }
-
-    private void checkPermission() {
-        int permissions = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-
-        if (permissions != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                    this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    CODE_REQUEST_WRITE_EXTERNAL
-            );
-        }
 
     }
 
@@ -71,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.button_video:
-                goToActivity(VideoActivity.class);
+                goToActivity(YUVActivity.class);
                 break;
         }
     }
