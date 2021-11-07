@@ -42,7 +42,9 @@ public class YUVRenderer implements SurfaceHolder.Callback, Runnable {
         mSurfaceWidth = width;
         mSurfaceHeight = height;
 
-        if (!mbStarted) {
+        if (mbStarted) {
+            onSurfaceChanged(width, height);
+        } else {
             mGLThread.start();
             mbStarted = true;
         }
@@ -62,5 +64,6 @@ public class YUVRenderer implements SurfaceHolder.Callback, Runnable {
     }
 
     private native void initRenderer(Surface surface, int surfaceWidth, int surfaceHeight, AssetManager assetManager);
+    private native void onSurfaceChanged(int width, int height);
     private native void shutDown();
 }

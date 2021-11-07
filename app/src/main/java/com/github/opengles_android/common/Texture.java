@@ -26,10 +26,6 @@ public class Texture {
     private int mWidth;
     private int mHeight;
 
-    public enum Type {
-        RGBA, YUV420P
-    }
-
     private Texture(int texID) {
         mTexID = texID;
     }
@@ -59,7 +55,7 @@ public class Texture {
         return texture;
     }
 
-    public static Texture loadFromAssets(Context context, String fileName, Type type) {
+    public static Texture loadFromAssets(Context context, String fileName) {
         try {
             InputStream inputStream = context.getResources().getAssets().open(fileName);
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);

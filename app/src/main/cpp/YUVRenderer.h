@@ -13,12 +13,14 @@ public:
     YUVRenderer(ANativeWindow* window, int surfaceWidth, int surfaceHeight);
     ~YUVRenderer() {};
 
-    void OnDrawFrame();
+    void OnSurfaceChanged(int width, int height);
     void Release();
     void ShutDown();
 
 private:
     const GLuint VERTEX_COUNT = 6;
+    const int TEXTURE_WIDTH = 1080;
+    const int TEXTURE_HEIGHT = 1920;
 
     Shader* pShader;
     ANativeWindow* pWindow;
@@ -34,6 +36,8 @@ private:
     bool mbShutDown = false;
 
     void Init();
+    void InitMatrix();
+    void OnDrawFrame();
     void FreeResources();
     void UpdateTexture();
     void InitYUVTexture();

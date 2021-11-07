@@ -61,7 +61,6 @@ target_link_libraries( # Specifies the target library.
         camera_renderer
         glm_shared
         GLESv3
-        GLESv2
         EGL
         android
 

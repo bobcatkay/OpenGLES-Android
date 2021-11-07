@@ -32,14 +32,13 @@ public class BitmapRender implements GLSurfaceView.Renderer {
 
     public BitmapRender(Context context) {
         mContext = context;
-        mTransform.rotate(180.0f, 0, 0, 1.0f);
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
         initVertex();
         mShader = new Shader(mContext, "common.vert", "texture2d.frag");
-        mTexture = Texture.loadFromAssets(mContext, "test.jpeg", Texture.Type.RGBA);
+        mTexture = Texture.loadFromAssets(mContext, "test2.jpg");
     }
 
     @Override
@@ -47,28 +46,33 @@ public class BitmapRender implements GLSurfaceView.Renderer {
         mSurfaceWidth = width;
         mSurfaceHeight = height;
 
+        mProjectionMatrix.loadIdentity();
         float aspectRatio = width > height ?
                 (float) width / (float) height :
                 (float) height / (float) width;
 
-        // 1. left：x的最小值
-        // 2. right：x的最大值
-        // 3. bottom：y的最小值
-        // 4. top：y的最大值
-        // 5. near：z的最小值
-        // 6. far：z的最大值
         if (width > height) {
-            // 横屏
             mProjectionMatrix.loadOrtho(-aspectRatio, aspectRatio, -1f, 1f, -1f, 1f);
-            float scaleX =(float) mTexture.getWidth()/ mTexture.getHeight();
-            mTransform.scale(scaleX, 1.0f, 1.0f);
         } else {
-            // 竖屏or正方形
             mProjectionMatrix.loadOrtho(-1f, 1f, -aspectRatio, aspectRatio, -1f, 1f);
-
-            float scaleY = (float) mTexture.getHeight() / mTexture.getWidth();
-            mTransform.scale(1.0f, scaleY, 1.0f);
         }
+
+        mTransform.loadIdentity();
+        int texWidth = mTexture.getWidth();
+        int texHeight = mTexture.getHeight();
+        float texRatio = (float) texHeight / texWidth;
+        float screenRatio = (float) height / width;
+        float scaleY = 1.0f;
+        float scaleX = 1.0f;
+
+        if (screenRatio > texRatio) {
+            scaleY = (float) width * texRatio / width;
+        } else {
+            scaleX = (float) height / texRatio / height;
+        }
+
+        mTransform.scale(scaleX, scaleY, 1.0f);
+        mTransform.rotate(180.0f, 0, 0, 1.0f);
     }
 
     @Override

@@ -22,7 +22,17 @@ Java_com_github_opengles_1android_examples_yuv_YUVRenderer_initRenderer(JNIEnv *
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_github_opengles_1android_examples_yuv_YUVRenderer_shutDown(JNIEnv *env, jobject thiz) {
-    if (nullptr != pRenderer) {
+    if (pRenderer) {
         pRenderer->ShutDown();
+    }
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_github_opengles_1android_examples_yuv_YUVRenderer_onSurfaceChanged(JNIEnv *env,
+                                                                            jobject thiz,
+                                                                            jint width,
+                                                                            jint height) {
+    if (pRenderer) {
+        pRenderer->OnSurfaceChanged(width, height);
     }
 }
