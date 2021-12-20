@@ -1,3 +1,5 @@
+#define STB_IMAGE_IMPLEMENTATION
+
 #include <jni.h>
 #include <string>
 #include <android/log.h>
@@ -5,15 +7,18 @@
 #include <EGL/egl.h>
 #include <GLES3/gl3.h>
 #include <unistd.h>
+#include "Texture.h"
+#include "stb_image.h"
 
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,"native-lib",__VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,"native-lib",__VA_ARGS__)
+//#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,"native-lib",__VA_ARGS__)
+//#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,"native-lib",__VA_ARGS__)
 
 void InitContext(JNIEnv *env, jobject surface);
 GLuint InitShaderProgram(const char* vertexCode, const char* fragCode);
 GLuint LoadShader(const char *code, GLenum type);
-void onDraw();
-void initVertex();
+void OnDraw();
+void InitVertex();
+void InitTexture();
 
 bool mbShutDown = false;
 GLuint mShaderProgram;
@@ -24,6 +29,7 @@ int mWindowWidth = 0;
 int mWindowHeight = 0;
 GLuint mVAO;
 GLuint mVertexCount = 3;
+const int TEXTURE_LOCATION = 1;
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -31,9 +37,13 @@ Java_com_github_opengles_1android_examples_native_1render_NativeRenderView_init(
                                                                                 jobject thiz,
                                                                                 jobject surface,
                                                                                 jstring vertex_code,
-                                                                                jstring frag_code) {
+                                                                                jstring frag_code,
+                                                                                jobject assetManager) {
+    InitUtil(env, assetManager);
+
     // Init EGL context
     InitContext(env, surface);
+    InitTexture();
 
     // Init shader mShaderProgram
     const char *vertexCode = env->GetStringUTFChars(vertex_code, nullptr);
@@ -46,14 +56,14 @@ Java_com_github_opengles_1android_examples_native_1render_NativeRenderView_init(
         return;
     }
 
-    initVertex();
+    InitVertex();
 
     while (!mbShutDown) {
         glViewport(0, 0, mWindowWidth, mWindowHeight);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(1.0f,1.0f,1.0f,1.0f);
 
-        onDraw();
+        OnDraw();
 
         eglSwapBuffers(mDisplay, mEglSurface);
     }
@@ -202,7 +212,7 @@ GLuint LoadShader(const char *code, GLenum type) {
     return shader;
 }
 
-void initVertex() {
+void InitVertex() {
     float vertices[] = {
             // positions       //color
             0,     0.5f, 0,   1.0f, 0, 0,
@@ -225,7 +235,22 @@ void initVertex() {
     glVertexAttribPointer(1, 3, GL_FLOAT, true, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 }
 
-void onDraw() {
+void InitTexture() {
+    char* path = new char[512];
+    int width, height, channels;
+    GetAssetPath(path, "test2.jpg");
+    unsigned char* data = stbi_load(path, &width, &height, &channels, 0);
+
+    if (!data) {
+        LOGE("Failed to load image at %s.", path);
+        return;
+    }
+
+    Texture *texture = Texture::GenRGBATexture(width, height, data, TEXTURE_LOCATION);
+    LOGE("texture id: %d.", texture->id);
+}
+
+void OnDraw() {
     glUseProgram(mShaderProgram);
     glBindVertexArray(mVAO);
     glDrawArrays(GL_TRIANGLES, 0, mVertexCount);

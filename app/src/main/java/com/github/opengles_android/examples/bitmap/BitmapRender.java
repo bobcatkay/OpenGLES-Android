@@ -61,14 +61,17 @@ public class BitmapRender implements GLSurfaceView.Renderer {
         int texWidth = mTexture.getWidth();
         int texHeight = mTexture.getHeight();
         float texRatio = (float) texHeight / texWidth;
-        float screenRatio = (float) height / width;
-        float scaleY = 1.0f;
-        float scaleX = 1.0f;
+        float scaleY;
+        float scaleX;
+        float targetHeight = width * texRatio;
 
-        if (screenRatio > texRatio) {
-            scaleY = (float) width * texRatio / width;
+        if (targetHeight <= height) {
+            scaleX = (width <= height) ? 1.0f : ((float) width / height);
+            scaleY = (width <= height) ? (targetHeight / width) : (targetHeight / height);
         } else {
-            scaleX = (float) height / texRatio / height;
+            float targetWidth = (float) height / texRatio;
+            scaleX = (width <= height) ? (targetWidth / width) : (targetWidth / height);
+            scaleY = (width <= height) ? ((float) height / width) : 1.0f;
         }
 
         mTransform.scale(scaleX, scaleY, 1.0f);
@@ -95,7 +98,7 @@ public class BitmapRender implements GLSurfaceView.Renderer {
     }
 
     private void initVertex() {
-        Log.d(TAG, "initVertex: ");
+        Log.d(TAG, "InitVertex: ");
 
         float[] vertices = Utils.genQuadVertieces();
         FloatBuffer vertexBuffer = Utils.floatArrayToBuffer(vertices);
@@ -115,5 +118,35 @@ public class BitmapRender implements GLSurfaceView.Renderer {
         GLES30.glVertexAttribPointer(0, 3, GLES30.GL_FLOAT, false, 5 * FLOAT_SIZE, 0);
         GLES30.glEnableVertexAttribArray(1);
         GLES30.glVertexAttribPointer(1, 2, GLES30.GL_FLOAT, false, 5 * FLOAT_SIZE, 3 * FLOAT_SIZE);
+    }
+
+    public void translate(float x, float y) {
+        mTransform.translate(x, y, 0);
+    }
+
+    public void rotateX(float degree) {
+        mTransform.rotate((float) Math.toRadians(degree), 1.0f, 0, 0);
+    }
+
+    public void rotateY(float degree) {
+        mTransform.rotate((float) Math.toRadians(degree), 0, 1.0f, 0);
+    }
+
+    public void rotateZ(float degree) {
+        mTransform.rotate((float) Math.toRadians(degree), 0, 0, 1.0f);
+    }
+
+    public void mirrorX() {
+        mTransform.scale(-1.0f, 1.0f, 1.0f);
+    }
+
+    public void mirrorY() {
+        mTransform.scale(1.0f, -1.0f, 1.0f);
+    }
+
+    public void destroy() {
+        GLES30.glDeleteBuffers(1, mVAO, 0);
+        mShader.release();
+        mTexture.release();
     }
 }

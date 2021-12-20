@@ -19,7 +19,6 @@ void GetAssetPath(char path[], const char* fileName) {
 }
 
 uint8_t* ReadDataFromAssets(const char* fileName, int& size) {
-    
     AAsset *pAsset = AAssetManager_open(pAssetManager, fileName, AASSET_MODE_RANDOM);
     size = AAsset_getLength(pAsset);
     LOGD("ReadDataFromAssets, size: %d", size);

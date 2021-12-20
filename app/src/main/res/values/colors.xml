@@ -15,4 +15,6 @@
     <color name="orange">#FF5722</color>
     <color name="green_light">#8BC34A</color>
     <color name="black_overlay">#66000000</color>
+    <color name="text_color">#018761</color>
+    <color name="progress_tint">#3E5151</color>
 </resources>

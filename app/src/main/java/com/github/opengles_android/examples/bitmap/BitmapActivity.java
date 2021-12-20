@@ -20,5 +20,13 @@ public class BitmapActivity extends FullScreenActivity {
 
         mBitmapRender = new BitmapRender(getApplicationContext());
         glSurfaceView.setRenderer(mBitmapRender);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        mBitmapRender.destroy();
     }
 }

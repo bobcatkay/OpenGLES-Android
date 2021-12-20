@@ -11,7 +11,8 @@
         android:theme="@style/Theme.OpenGLESAndroid">
         <activity
             android:name=".MainActivity"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -29,7 +30,7 @@
             android:theme="@style/Theme.OpenGLESAndroid.Fullscreen" />
         <activity
             android:name=".examples.camera.CameraActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullSensor"
             android:theme="@style/Theme.OpenGLESAndroid.Fullscreen" />
         <activity
             android:name=".examples.yuv.YUVActivity"

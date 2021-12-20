@@ -39,8 +39,6 @@ private:
     void InitMatrix();
     void OnDrawFrame();
     void FreeResources();
-    void UpdateTexture();
-    void InitYUVTexture();
 };
 
 

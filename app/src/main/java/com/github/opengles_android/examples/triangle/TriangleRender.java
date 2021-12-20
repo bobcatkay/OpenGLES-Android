@@ -58,7 +58,7 @@ public class TriangleRender implements GLSurfaceView.Renderer {
     }
 
     private void initVertex() {
-        Log.d(TAG, "initVertex: ");
+        Log.d(TAG, "InitVertex: ");
 
         float vertices[] = {
                 // positions       //color

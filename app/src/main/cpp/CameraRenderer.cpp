@@ -75,7 +75,7 @@ void CameraRenderer::UpdateTexture(AHardwareBuffer* buffer, int width, int heigh
 void CameraRenderer::OnDrawFrame(AHardwareBuffer *buffer, int width, int height) {
     glViewport(0, 0, mWindowWidth, mWindowHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(1.0f,1.0f,0.0f,1.0f);
+    glClearColor(0.0f,0.0f,0.0f,1.0f);
 
     UpdateTexture(buffer, width, height);
 

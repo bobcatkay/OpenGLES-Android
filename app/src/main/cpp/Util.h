@@ -19,8 +19,8 @@
 #include <android/hardware_buffer.h>
 #include <android/hardware_buffer_jni.h>
 
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, "camera_renderer", __VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "camera_renderer", __VA_ARGS__)
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, "OpenGLES-Android", __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "OpenGLES-Android", __VA_ARGS__)
 
 const EGLint IMAGE_KHR_ATTR[3] = {EGL_IMAGE_PRESERVED_KHR, EGL_TRUE, EGL_NONE};
 

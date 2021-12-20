@@ -1,6 +1,7 @@
 package com.github.opengles_android.examples.native_render;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Surface;
@@ -73,10 +74,10 @@ public class NativeRenderView extends SurfaceView implements SurfaceHolder.Callb
     public void run() {
         String vertexCode = Utils.getStringFromAssets(getContext(), "triangle.vert");
         String fragCode = Utils.getStringFromAssets(getContext(), "triangle.frag");
-        init(mSurface, vertexCode, fragCode);
+        init(mSurface, vertexCode, fragCode, getContext().getAssets());
     }
 
-    private native void init(Surface surface, String vertexCode, String fragCode);
+    private native void init(Surface surface, String vertexCode, String fragCode, AssetManager assetManager);
 
     private native void setSurfaceSize(int width, int height);
 

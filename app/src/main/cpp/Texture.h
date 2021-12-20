@@ -20,6 +20,7 @@ public:
     Texture();
     ~Texture();
     static Texture* GenSingleChannelTexture(int width, int height, const void *pixels, int location = 0);
+    static Texture* GenRGBATexture(int width, int height, const void *pixels, int location);
     void ActiveTexture();
     void UpdateData(uint8_t* pixels);
 

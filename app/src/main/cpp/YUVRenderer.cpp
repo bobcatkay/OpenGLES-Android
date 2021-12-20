@@ -107,16 +107,6 @@ void YUVRenderer::FreeResources() {
     glDeleteBuffers(1, &mVAO);
 }
 
-void YUVRenderer::UpdateTexture() {
-
-}
-
-
-void YUVRenderer::InitYUVTexture() {
-    LOGD("InitYUVTexture");
-
-}
-
 void YUVRenderer::ShutDown() {
     mbShutDown = true;
 }
@@ -140,15 +130,18 @@ void YUVRenderer::InitMatrix() {
     }
 
     mTransformMatrix = glm::mat4(1.0f);
-    float texRatio = (float) TEXTURE_HEIGHT / TEXTURE_WIDTH;
-    float screenRatio = (float) mWindowHeight / mWindowWidth;
-    float scaleY = 1.0f;
-    float scaleX = 1.0f;
+    float texRatio = (float) TEXTURE_HEIGHT / TEXTURE_WIDTH;;
+    float scaleY;
+    float scaleX;
+    float targetHeight = mWindowWidth * texRatio;
 
-    if (screenRatio > texRatio) {
-        scaleY = (float) mWindowWidth * texRatio / mWindowWidth;
+    if (targetHeight <= mWindowHeight) {
+        scaleX = (mWindowWidth <= mWindowHeight) ? 1.0f : ((float) mWindowWidth / mWindowHeight);
+        scaleY = (mWindowWidth <= mWindowHeight) ? (targetHeight / mWindowWidth) : (targetHeight / mWindowHeight);
     } else {
-        scaleX = (float) mWindowHeight / texRatio / mWindowHeight;
+        float targetWidth = (float) mWindowHeight / texRatio;
+        scaleX = (mWindowWidth <= mWindowHeight) ? (targetWidth / mWindowWidth) : (targetWidth / mWindowHeight);
+        scaleY = (mWindowWidth <= mWindowHeight) ? ((float) mWindowHeight / mWindowWidth) : 1.0f;
     }
 
     mTransformMatrix = glm::scale(mTransformMatrix, glm::vec3(scaleX, scaleY, 1.0f));
