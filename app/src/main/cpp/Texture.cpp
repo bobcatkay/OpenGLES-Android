@@ -54,7 +54,7 @@ void Texture::ActiveTexture() {
     glActiveTexture(GL_TEXTURE0 + location);
     glBindTexture(GL_TEXTURE_2D, id);
 
-    LOGD("Texture::ActiveTexture, id: %d, location: %d", id, location);
+    //LOGD("Texture::ActiveTexture, id: %d, location: %d", id, location);
 }
 
 void Texture::UpdateData(uint8_t *pixels) {

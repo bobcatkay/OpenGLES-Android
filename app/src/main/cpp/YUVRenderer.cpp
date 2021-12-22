@@ -41,9 +41,9 @@ void YUVRenderer::Init() {
     memcpy(uData, &data[yDataSize], uDataSize);
     memcpy(vData, &data[yDataSize + uDataSize], vDataSize);
 
-    mTexture[0] = Texture::GenSingleChannelTexture(TEXTURE_WIDTH, TEXTURE_HEIGHT, yData, 0);
-    mTexture[1] = Texture::GenSingleChannelTexture(TEXTURE_WIDTH / 2, TEXTURE_HEIGHT / 2, uData, 1);
-    mTexture[2] = Texture::GenSingleChannelTexture(TEXTURE_WIDTH / 2, TEXTURE_HEIGHT / 2, vData, 2);
+    mTexture[0] = Texture::GenSingleChannelTexture(TEXTURE_WIDTH, TEXTURE_HEIGHT, yData, 1);
+    mTexture[1] = Texture::GenSingleChannelTexture(TEXTURE_WIDTH / 2, TEXTURE_HEIGHT / 2, uData, 2);
+    mTexture[2] = Texture::GenSingleChannelTexture(TEXTURE_WIDTH / 2, TEXTURE_HEIGHT / 2, vData, 3);
 
 //    mTexture[0]->UpdateData(yData);
 //    mTexture[1]->UpdateData(uData);
@@ -52,6 +52,10 @@ void YUVRenderer::Init() {
     delete[](yData);
     delete[](uData);
     delete[](vData);
+
+    mTexture[0]->ActiveTexture();
+    mTexture[1]->ActiveTexture();
+    mTexture[2]->ActiveTexture();
 
     pShader->SetInt("yTex", mTexture[0]->location);
     pShader->SetInt("uTex", mTexture[1]->location);
@@ -74,12 +78,6 @@ void YUVRenderer::OnDrawFrame() {
     pShader->UseProgram();
     pShader->SetMat4("uProjection", mProjectionMatrix);
     pShader->SetMat4("uTransform", mTransformMatrix);
-
-    for (int i=0; i<3; i++) {
-        if (mTexture[i]) {
-            mTexture[i]->ActiveTexture();
-        }
-    }
 
     glBindVertexArray(mVAO);
     glDrawElements(GL_TRIANGLES, VERTEX_COUNT, GL_UNSIGNED_INT, 0);
