@@ -57,9 +57,9 @@ void YUVRenderer::Init() {
     mTexture[1]->ActiveTexture();
     mTexture[2]->ActiveTexture();
 
-    pShader->SetInt("yTex", mTexture[0]->location);
-    pShader->SetInt("uTex", mTexture[1]->location);
-    pShader->SetInt("vTex", mTexture[2]->location);
+    pShader->SetInt("yTex", mTexture[0]->unit);
+    pShader->SetInt("uTex", mTexture[1]->unit);
+    pShader->SetInt("vTex", mTexture[2]->unit);
 
     InitMatrix();
 

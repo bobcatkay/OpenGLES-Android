@@ -11,7 +11,7 @@ private:
     char mPrintString[128];
 public:
     GLuint id;
-    GLint location;
+    GLint unit;
     GLint width;
     GLint height;
     GLint format;
@@ -19,13 +19,13 @@ public:
 
     Texture();
     ~Texture();
-    static Texture* GenSingleChannelTexture(int width, int height, const void *pixels, int location = 0);
-    static Texture* GenRGBATexture(int width, int height, const void *pixels, int location);
+    static Texture* GenSingleChannelTexture(int width, int height, const void *pixels, int unit = 0);
+    static Texture* GenRGBATexture(int width, int height, const void *pixels, int unit);
     void ActiveTexture();
     void UpdateData(uint8_t* pixels);
 
     const char* ToString() {
-        sprintf(mPrintString, "{id: %d, location: %d, width: %d, height: %d, format: %d}", id, location, width, height, format);
+        sprintf(mPrintString, "{id: %d, unit: %d, width: %d, height: %d, format: %d}", id, unit, width, height, format);
 
         return mPrintString;
     }

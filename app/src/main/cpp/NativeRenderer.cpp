@@ -18,7 +18,7 @@ GLuint InitShaderProgram(const char* vertexCode, const char* fragCode);
 GLuint LoadShader(const char *code, GLenum type);
 void OnDraw();
 void InitVertex();
-void InitTexture();
+Texture* InitTexture(const char*);
 
 bool mbShutDown = false;
 GLuint mShaderProgram;
@@ -29,7 +29,7 @@ int mWindowWidth = 0;
 int mWindowHeight = 0;
 GLuint mVAO;
 GLuint mVertexCount = 3;
-const int TEXTURE_LOCATION = 1;
+const int TEXTURE_UNIT = 1;
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -38,12 +38,15 @@ Java_com_github_opengles_1android_examples_native_1render_NativeRenderView_init(
                                                                                 jobject surface,
                                                                                 jstring vertex_code,
                                                                                 jstring frag_code,
-                                                                                jobject assetManager) {
-    InitUtil(env, assetManager);
-
+                                                                                jstring file_path) {
     // Init EGL context
     InitContext(env, surface);
-    InitTexture();
+
+    InitVertex();
+
+    const char *filePath = env->GetStringUTFChars(file_path, nullptr);
+    Texture *pTexture = InitTexture(filePath);
+    env->ReleaseStringUTFChars(file_path, filePath);
 
     // Init shader mShaderProgram
     const char *vertexCode = env->GetStringUTFChars(vertex_code, nullptr);
@@ -56,7 +59,9 @@ Java_com_github_opengles_1android_examples_native_1render_NativeRenderView_init(
         return;
     }
 
-    InitVertex();
+    glUseProgram(mShaderProgram);
+    glUniform1i(glGetUniformLocation(mShaderProgram, "uTexture"), pTexture->unit);
+    pTexture->ActiveTexture();
 
     while (!mbShutDown) {
         glViewport(0, 0, mWindowWidth, mWindowHeight);
@@ -214,13 +219,14 @@ GLuint LoadShader(const char *code, GLenum type) {
 
 void InitVertex() {
     float vertices[] = {
-            // positions       //color
-            0,     0.5f, 0,   1.0f, 0, 0,
-            -1.0f, -0.5f, 0,   0, 1.0f, 0,
-            1.0f, -0.5f, 0,    0, 0, 1.0f,
+            // positions            //texture
+            -1.0f,  1.0f, 0.0f,    0.0f, 0.0f,  // top left
+            -1.0f, -1.0f, 0.0f,    0.0f, 1.0f, // bottom left
+            1.0f,  1.0f, 0.0f,     1.0f, 0.0f, // top right
+            1.0f, -1.0f, 0.0f,     1.0f, 1.0f, // bottom right
     };
 
-    mVertexCount = 3;
+    mVertexCount = 4;
     glGenVertexArrays(1, &mVAO);
     glBindVertexArray(mVAO);
 
@@ -230,28 +236,29 @@ void InitVertex() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float ), (void*) 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float ), (void*) 0);
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, true, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, true, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 }
 
-void InitTexture() {
-    char* path = new char[512];
+Texture* InitTexture(const char* path) {
     int width, height, channels;
-    GetAssetPath(path, "test2.jpg");
     unsigned char* data = stbi_load(path, &width, &height, &channels, 0);
 
     if (!data) {
-        LOGE("Failed to load image at %s.", path);
-        return;
+        LOGE("InitTexture, Failed to load image at %s.", path);
+
+        return nullptr;
     }
 
-    Texture *texture = Texture::GenRGBATexture(width, height, data, TEXTURE_LOCATION);
-    LOGE("texture id: %d.", texture->id);
+    Texture *texture = Texture::GenRGBATexture(width, height, data, TEXTURE_UNIT);
+    LOGD("InitTexture, texture: %s, channels: %d.", texture->ToString(), channels);
+    
+    return texture;
 }
 
 void OnDraw() {
     glUseProgram(mShaderProgram);
     glBindVertexArray(mVAO);
-    glDrawArrays(GL_TRIANGLES, 0, mVertexCount);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, mVertexCount);
 }
