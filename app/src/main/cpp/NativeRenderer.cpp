@@ -9,6 +9,9 @@
 #include <unistd.h>
 #include "Texture.h"
 #include "stb_image.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/ext.hpp"
 
 //#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,"native-lib",__VA_ARGS__)
 //#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,"native-lib",__VA_ARGS__)
@@ -30,6 +33,40 @@ int mWindowHeight = 0;
 GLuint mVAO;
 GLuint mVertexCount = 3;
 const int TEXTURE_UNIT = 1;
+glm::mat4 mProjectionMatrix = glm::mat4(1.0f);
+glm::mat4 mTransformMatrix = glm::mat4(1.0f);
+
+
+void InitMatrix(int texWidth, int texHeight) {
+    mProjectionMatrix = glm::mat4(1.0f);
+    float aspectRatio = mWindowWidth > mWindowHeight ?
+                        (float) mWindowWidth / (float) mWindowHeight :
+                        (float) mWindowHeight / (float) mWindowWidth;
+
+    if (mWindowWidth > mWindowHeight) {
+        mProjectionMatrix = glm::ortho(-aspectRatio, aspectRatio, -1.0f, 1.0f, -1.0f, 1.0f);
+    } else {
+        mProjectionMatrix = glm::ortho(-1.0f, 1.0f, -aspectRatio, aspectRatio, -1.0f, 1.0f);
+    }
+
+    float scaleY = 1.0f;
+    float scaleX = 1.0f;
+
+    float texRatio = (float) texHeight / texWidth;
+    float targetHeight = mWindowWidth * texRatio;
+
+    if (targetHeight <= mWindowHeight) {
+        scaleX = (mWindowWidth <= mWindowHeight) ? 1.0f : ((float) mWindowWidth / mWindowHeight);
+        scaleY = (mWindowWidth <= mWindowHeight) ? (targetHeight / mWindowWidth) : (targetHeight / mWindowHeight);
+    } else {
+        float targetWidth = (float) mWindowHeight / texRatio;
+        scaleX = (mWindowWidth <= mWindowHeight) ? (targetWidth / mWindowWidth) : (targetWidth / mWindowHeight);
+        scaleY = (mWindowWidth <= mWindowHeight) ? ((float) mWindowHeight / mWindowWidth) : 1.0f;
+    }
+
+    mTransformMatrix = glm::mat4(1.0f);
+    mTransformMatrix = glm::scale(mTransformMatrix, glm::vec3(scaleX, scaleY, 1.0f));
+}
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -48,6 +85,8 @@ Java_com_github_opengles_1android_examples_native_1render_NativeRenderView_init(
     Texture *pTexture = InitTexture(filePath);
     env->ReleaseStringUTFChars(file_path, filePath);
 
+    InitMatrix(pTexture->width, pTexture->height);
+
     // Init shader mShaderProgram
     const char *vertexCode = env->GetStringUTFChars(vertex_code, nullptr);
     const char *fragCode = env->GetStringUTFChars(frag_code, nullptr);
@@ -62,6 +101,8 @@ Java_com_github_opengles_1android_examples_native_1render_NativeRenderView_init(
     glUseProgram(mShaderProgram);
     glUniform1i(glGetUniformLocation(mShaderProgram, "uTexture"), pTexture->unit);
     pTexture->ActiveTexture();
+    glUniformMatrix4fv(glGetUniformLocation(mShaderProgram, "uTransform"), 1, GL_FALSE, glm::value_ptr(mTransformMatrix));
+    glUniformMatrix4fv(glGetUniformLocation(mShaderProgram, "uProjection"), 1, GL_FALSE, glm::value_ptr(mProjectionMatrix));
 
     while (!mbShutDown) {
         glViewport(0, 0, mWindowWidth, mWindowHeight);
@@ -251,7 +292,7 @@ Texture* InitTexture(const char* path) {
         return nullptr;
     }
 
-    Texture *texture = Texture::GenRGBATexture(width, height, data, TEXTURE_UNIT);
+    Texture *texture = Texture::GenTexture(width, height, data, TEXTURE_UNIT);
     LOGD("InitTexture, texture: %s, channels: %d.", texture->ToString(), channels);
     
     return texture;

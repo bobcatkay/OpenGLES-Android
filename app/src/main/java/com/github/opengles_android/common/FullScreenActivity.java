@@ -24,4 +24,8 @@ public class FullScreenActivity extends AppCompatActivity {
 
         getWindow().setAttributes(attributes);
     }
+
+    public void onClickBackButton(View v) {
+        onBackPressed();
+    }
 }

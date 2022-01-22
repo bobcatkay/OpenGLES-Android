@@ -30,7 +30,7 @@
             android:theme="@style/Theme.OpenGLESAndroid.Fullscreen" />
         <activity
             android:name=".examples.camera.CameraActivity"
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.OpenGLESAndroid.Fullscreen" />
         <activity
             android:name=".examples.yuv.YUVActivity"

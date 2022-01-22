@@ -1,6 +1,7 @@
 package com.github.opengles_android.common;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -19,6 +20,7 @@ public class NumSeekBar extends AppCompatSeekBar {
     private Paint mPaint;
     private Rect mTextBounds = new Rect();
     private int mPaddingRight;
+    private float mProgressUnit;
 
     public NumSeekBar(@NonNull Context context) {
         this(context, null);
@@ -26,6 +28,9 @@ public class NumSeekBar extends AppCompatSeekBar {
 
     public NumSeekBar(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+
+        TypedArray t = context.obtainStyledAttributes(attrs, R.styleable.NumSeekBar);
+        mProgressUnit = t.getFloat(R.styleable.NumSeekBar_progressUnit, 1.0f);
 
         mPaint = new Paint();
         mPaint.setTextSize(getResources().getDimension(R.dimen.seekbar_text_size));
@@ -48,11 +53,14 @@ public class NumSeekBar extends AppCompatSeekBar {
             canvas.drawText(title, 0, textHeight, mPaint);
         }
 
-        String text = String.valueOf(getProgress());
+        String text = String.valueOf(getProgress() / mProgressUnit);
         mPaint.getTextBounds(text, 0, text.length(), mTextBounds);
         textWidth = mTextBounds.width();
         textHeight = mTextBounds.height();
         canvas.drawText(text, getWidth() - textWidth - mPaddingRight, textHeight, mPaint);
+    }
 
+    public float getProgressUnit() {
+        return mProgressUnit;
     }
 }

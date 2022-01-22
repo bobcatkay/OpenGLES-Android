@@ -1,6 +1,8 @@
 package com.github.opengles_android.examples.bitmap;
 
 import android.content.Context;
+import android.opengl.GLES10;
+import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
@@ -29,6 +31,8 @@ public class BitmapRender implements GLSurfaceView.Renderer {
     private Matrix4f mTransform = new Matrix4f();
     private Matrix4f mProjectionMatrix = new Matrix4f();;
     private Texture mTexture;
+    private float mInitialScaleX;
+    private float mInitialScaleY;
 
     public BitmapRender(Context context) {
         mContext = context;
@@ -38,7 +42,7 @@ public class BitmapRender implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
         initVertex();
         mShader = new Shader(mContext, "common.vert", "texture2d.frag");
-        mTexture = Texture.loadFromAssets(mContext, "test2.jpg");
+        mTexture = Texture.loadFromAssets(mContext, "test.jpg");
     }
 
     @Override
@@ -57,25 +61,21 @@ public class BitmapRender implements GLSurfaceView.Renderer {
             mProjectionMatrix.loadOrtho(-1f, 1f, -aspectRatio, aspectRatio, -1f, 1f);
         }
 
-        mTransform.loadIdentity();
         int texWidth = mTexture.getWidth();
         int texHeight = mTexture.getHeight();
         float texRatio = (float) texHeight / texWidth;
-        float scaleY;
-        float scaleX;
         float targetHeight = width * texRatio;
 
         if (targetHeight <= height) {
-            scaleX = (width <= height) ? 1.0f : ((float) width / height);
-            scaleY = (width <= height) ? (targetHeight / width) : (targetHeight / height);
+            mInitialScaleX = (width <= height) ? 1.0f : ((float) width / height);
+            mInitialScaleY = (width <= height) ? (targetHeight / width) : (targetHeight / height);
         } else {
             float targetWidth = (float) height / texRatio;
-            scaleX = (width <= height) ? (targetWidth / width) : (targetWidth / height);
-            scaleY = (width <= height) ? ((float) height / width) : 1.0f;
+            mInitialScaleX = (width <= height) ? (targetWidth / width) : (targetWidth / height);
+            mInitialScaleY = (width <= height) ? ((float) height / width) : 1.0f;
         }
 
-        mTransform.scale(scaleX, scaleY, 1.0f);
-        mTransform.rotate(180.0f, 0, 0, 1.0f);
+        updateTransform(new TransformData());
     }
 
     @Override
@@ -86,11 +86,15 @@ public class BitmapRender implements GLSurfaceView.Renderer {
         GLES30.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
         mShader.use();
-        mShader.setMat4("uTransform", mTransform.getArray());
+
+        synchronized (this) {
+            mShader.setMat4("uTransform", mTransform.getArray());
+        }
+
         mShader.setMat4("uProjection", mProjectionMatrix.getArray());
         mShader.setInt("uTexture", 0);
         Utils.checkGLError();
-        mTexture.use(0);
+        mTexture.bind(0);
         Utils.checkGLError();
         GLES30.glBindVertexArray(mVAO[0]);
         GLES30.glDrawArrays(GLES20.GL_TRIANGLES, 0, mVertexCount);
@@ -120,28 +124,16 @@ public class BitmapRender implements GLSurfaceView.Renderer {
         GLES30.glVertexAttribPointer(1, 2, GLES30.GL_FLOAT, false, 5 * FLOAT_SIZE, 3 * FLOAT_SIZE);
     }
 
-    public void translate(float x, float y) {
-        mTransform.translate(x, y, 0);
-    }
+    public synchronized void updateTransform(TransformData data) {
+        mTransform.loadIdentity();
 
-    public void rotateX(float degree) {
-        mTransform.rotate((float) Math.toRadians(degree), 1.0f, 0, 0);
-    }
+        mTransform.translate(data.mTranslateX, data.mTranslateY, 0);
+        mTransform.rotate(data.mRotateX, 1.0f, 0, 0);
+        mTransform.rotate(data.mRotateY, 0, 1.0f, 0);
+        mTransform.rotate(data.mRotateZ, 0, 0, 1.0f);
+        mTransform.scale(data.mScaleX, data.mScaleY, 1.0f);
 
-    public void rotateY(float degree) {
-        mTransform.rotate((float) Math.toRadians(degree), 0, 1.0f, 0);
-    }
-
-    public void rotateZ(float degree) {
-        mTransform.rotate((float) Math.toRadians(degree), 0, 0, 1.0f);
-    }
-
-    public void mirrorX() {
-        mTransform.scale(-1.0f, 1.0f, 1.0f);
-    }
-
-    public void mirrorY() {
-        mTransform.scale(1.0f, -1.0f, 1.0f);
+        mTransform.scale(mInitialScaleX, mInitialScaleY, 1.0f);
     }
 
     public void destroy() {

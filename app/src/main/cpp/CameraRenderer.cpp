@@ -59,9 +59,6 @@ void CameraRenderer::UpdateTexture(AHardwareBuffer* buffer, int width, int heigh
 
         mTransformMatrix = glm::scale(mTransformMatrix, glm::vec3(scaleX, scaleY, 1.0f));
         mTransformMatrix = glm::rotate(mTransformMatrix, glm::radians(270.0f), glm::vec3(0, 0, 1.0f));
-
-        // Left-Right mirror
-        //mTransformMatrix = glm::scale(mTransformMatrix, glm::vec3(1.0f, -1.0f, 1.0f));
     }
 
     if (nullptr != pLastBuffer) {

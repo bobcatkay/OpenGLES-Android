@@ -19,9 +19,9 @@
         android:paddingRight="@dimen/seekbar_padding_right"
         android:tooltipText="Translate X"
         android:progressBackgroundTint="@color/progress_tint"
-        android:progress="0"
-        android:min="0"
-        android:max="360"
+        app:progressUnit="100"
+        android:min="-100"
+        android:max="100"
         android:layout_centerHorizontal="true"
         />
 
@@ -33,9 +33,9 @@
         android:layout_width="@dimen/seekbar_width"
         android:layout_height="@dimen/seekbar_height"
         android:progressBackgroundTint="@color/progress_tint"
-        android:progress="0"
-        android:min="0"
-        android:max="360"
+        app:progressUnit="100"
+        android:min="-100"
+        android:max="100"
         android:layout_centerHorizontal="true"
         />
 
@@ -47,10 +47,82 @@
         android:layout_width="@dimen/seekbar_width"
         android:layout_height="@dimen/seekbar_height"
         android:progressBackgroundTint="@color/progress_tint"
-        android:progress="100"
+        app:progressUnit="100"
         android:min="-200"
         android:max="200"
         android:layout_centerHorizontal="true"
         />
+
+    <com.github.opengles_android.common.NumSeekBar
+        android:id="@+id/seekbar_scale_y"
+        android:layout_below="@+id/seekbar_scale_x"
+        android:tooltipText="Scale Y"
+        android:paddingRight="@dimen/seekbar_padding_right"
+        android:layout_width="@dimen/seekbar_width"
+        android:layout_height="@dimen/seekbar_height"
+        android:progressBackgroundTint="@color/progress_tint"
+        app:progressUnit="100"
+        android:min="-200"
+        android:max="200"
+        android:layout_centerHorizontal="true"
+        />
+
+    <com.github.opengles_android.common.NumSeekBar
+        android:id="@+id/seekbar_rotate_x"
+        android:layout_below="@+id/seekbar_scale_y"
+        android:tooltipText="Rotate X"
+        android:paddingRight="@dimen/seekbar_padding_right"
+        android:layout_width="@dimen/seekbar_width"
+        android:layout_height="@dimen/seekbar_height"
+        android:progressBackgroundTint="@color/progress_tint"
+        android:min="0"
+        android:max="360"
+        android:layout_centerHorizontal="true"
+        />
+
+    <com.github.opengles_android.common.NumSeekBar
+        android:id="@+id/seekbar_rotate_y"
+        android:layout_below="@+id/seekbar_rotate_x"
+        android:tooltipText="Rotate Y"
+        android:paddingRight="@dimen/seekbar_padding_right"
+        android:layout_width="@dimen/seekbar_width"
+        android:layout_height="@dimen/seekbar_height"
+        android:progressBackgroundTint="@color/progress_tint"
+        android:min="0"
+        android:max="360"
+        android:layout_centerHorizontal="true"
+        />
+
+    <com.github.opengles_android.common.NumSeekBar
+        android:id="@+id/seekbar_rotate_z"
+        android:layout_below="@+id/seekbar_rotate_y"
+        android:tooltipText="Rotate Z"
+        android:paddingRight="@dimen/seekbar_padding_right"
+        android:layout_width="@dimen/seekbar_width"
+        android:layout_height="@dimen/seekbar_height"
+        android:progressBackgroundTint="@color/progress_tint"
+        android:min="0"
+        android:max="360"
+        android:layout_centerHorizontal="true"
+        />
+
+    <Button
+        android:text="Reset"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"
+        android:onClick="onClickReset"
+        android:backgroundTint="@color/blue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="50dp"
+        android:src="@drawable/ic_baseline_arrow_back_24"
+        android:onClick="onClickBackButton"/>
 
 </RelativeLayout>

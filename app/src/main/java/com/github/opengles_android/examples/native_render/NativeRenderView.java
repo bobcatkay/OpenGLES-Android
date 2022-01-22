@@ -82,14 +82,14 @@ public class NativeRenderView extends SurfaceView implements SurfaceHolder.Callb
             return;
         }
 
-        String vertexCode = Utils.getStringFromAssets(getContext(), "native.vert");
+        String vertexCode = Utils.getStringFromAssets(getContext(), "common.vert");
         String fragCode = Utils.getStringFromAssets(getContext(), "texture2d.frag");
         init(mSurface, vertexCode, fragCode, filePath);
     }
 
     private String prepareFile() {
         File filesDir = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        String path =  String.format("%s/%s", filesDir.getAbsolutePath(), "/test.jpg");
+        String path =  String.format("%s/%s", filesDir.getAbsolutePath(), "/test2.jpg");
 
         if (new File(path).exists()) {
             return path;

@@ -70,7 +70,7 @@ public class Texture {
         return null;
     }
 
-    public void use(int texUnit) {
+    public void bind(int texUnit) {
         GLES30.glActiveTexture(GL_TEXTURE0 + texUnit);
         GLES30.glBindTexture(GL_TEXTURE_2D, mTexID);
     }

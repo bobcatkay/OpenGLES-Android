@@ -19,6 +19,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.util.Log;
+import android.util.Range;
 import android.util.Size;
 import android.view.Surface;
 
@@ -34,7 +35,6 @@ import androidx.annotation.RequiresApi;
 public class CameraController {
     private static final String TAG = "CameraController";
     private static final int MSG_ON_CONFIGURED = 0x100;
-    private static final int MSG_DO_PREV_CAPTURE = 0x101;
     private static final float RATIO = 4.0f / 3;
     private static final int MAX_SIZE = 1920;
 
@@ -201,7 +201,9 @@ public class CameraController {
         Log.d(TAG, "createCaptureRequest");
 
         try {
-            CaptureRequest.Builder builder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+            CaptureRequest.Builder builder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            Range<Integer> fps = new Range<>(60, 60);
+            builder.set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, fps);
             builder.addTarget(mImageReader.getSurface());
             mPrevCaptureRequest = builder.build();
         } catch (CameraAccessException e) {

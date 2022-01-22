@@ -31,7 +31,7 @@ Texture *Texture::GenSingleChannelTexture(int width, int height, const void *pix
     return texture;
 }
 
-Texture *Texture::GenRGBATexture(int width, int height, const void *pixels, int unit) {
+Texture *Texture::GenTexture(int width, int height, const void *pixels, int unit) {
     auto* texture = new Texture();
     texture->unit = unit;
     texture->width = width;
