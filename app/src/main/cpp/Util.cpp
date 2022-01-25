@@ -178,4 +178,5 @@ void BindHardwareBuffer(GLuint texId, AHardwareBuffer* buffer, EGLDisplay& displ
     // Create OpenGL texture from the EGLImage.
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, texId);
     glEGLImageTargetTexture2DOES(GL_TEXTURE_EXTERNAL_OES, image);
+    AHardwareBuffer_release(buffer);
 }

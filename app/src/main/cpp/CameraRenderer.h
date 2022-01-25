@@ -27,7 +27,6 @@ private:
     EGLContext mContext;
     int mWindowWidth = 0;
     int mWindowHeight = 0;
-    AHardwareBuffer* pLastBuffer = nullptr;
     GLuint mVAO;
     GLuint mTexId = 0;
     GLuint mLastBufferWidth = 0;

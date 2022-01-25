@@ -61,12 +61,7 @@ void CameraRenderer::UpdateTexture(AHardwareBuffer* buffer, int width, int heigh
         mTransformMatrix = glm::rotate(mTransformMatrix, glm::radians(270.0f), glm::vec3(0, 0, 1.0f));
     }
 
-    if (nullptr != pLastBuffer) {
-        AHardwareBuffer_release(pLastBuffer);
-    }
-
     BindHardwareBuffer(mTexId, buffer, mDisplay);
-    pLastBuffer = buffer;
 }
 
 void CameraRenderer::OnDrawFrame(AHardwareBuffer *buffer, int width, int height) {
@@ -99,10 +94,6 @@ void CameraRenderer::Release() {
 
     if (nullptr != pShader) {
         delete(pShader);
-    }
-
-    if (nullptr != pLastBuffer) {
-        AHardwareBuffer_release(pLastBuffer);
     }
 }
 
