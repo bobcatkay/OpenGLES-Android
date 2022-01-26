@@ -22,8 +22,10 @@ Java_com_github_opengles_1android_examples_yuv_YUVRenderer_initRenderer(JNIEnv *
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_github_opengles_1android_examples_yuv_YUVRenderer_shutDown(JNIEnv *env, jobject thiz) {
+    //TODO pRender被释放导致泄漏
     if (pRenderer) {
         pRenderer->ShutDown();
+        delete(pRenderer);
     }
 }
 extern "C"

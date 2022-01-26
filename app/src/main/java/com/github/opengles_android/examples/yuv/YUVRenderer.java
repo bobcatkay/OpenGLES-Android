@@ -55,7 +55,6 @@ public class YUVRenderer implements SurfaceHolder.Callback, Runnable {
         Log.e(TAG, "surfaceDestroyed");
 
         shutDown();
-
     }
 
     @Override

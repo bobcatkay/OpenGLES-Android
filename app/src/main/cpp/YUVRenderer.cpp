@@ -86,15 +86,10 @@ void YUVRenderer::OnDrawFrame() {
 }
 
 void YUVRenderer::Release() {
+    FreeResources();
     eglDestroySurface(mDisplay, mEglSurface);
     eglDestroyContext(mDisplay, mContext);
     ANativeWindow_release(pWindow);
-
-    FreeResources();
-
-    if (pShader) {
-        delete(pShader);
-    }
 }
 
 void YUVRenderer::FreeResources() {
@@ -103,6 +98,10 @@ void YUVRenderer::FreeResources() {
     }
 
     glDeleteBuffers(1, &mVAO);
+
+    if (pShader) {
+        delete(pShader);
+    }
 }
 
 void YUVRenderer::ShutDown() {

@@ -85,15 +85,15 @@ void CameraRenderer::OnDrawFrame(AHardwareBuffer *buffer, int width, int height)
 }
 
 void CameraRenderer::Release() {
-    eglDestroySurface(mDisplay, mEglSurface);
-    eglDestroyContext(mDisplay, mContext);
-    ANativeWindow_release(pWindow);
-
     glDeleteBuffers(1, &mVAO);
     glDeleteTextures(1, &mTexId);
 
     if (nullptr != pShader) {
         delete(pShader);
     }
+
+    eglDestroySurface(mDisplay, mEglSurface);
+    eglDestroyContext(mDisplay, mContext);
+    ANativeWindow_release(pWindow);
 }
 

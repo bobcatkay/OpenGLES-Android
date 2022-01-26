@@ -22,7 +22,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_github_opengles_1android_examples_camera_CameraRenderer_release(JNIEnv *env,
                                                                          jobject thiz) {
-    if (nullptr != pRenderer) {
+    if (pRenderer) {
         pRenderer->Release();
         delete(pRenderer);
     }
@@ -37,8 +37,8 @@ Java_com_github_opengles_1android_examples_camera_CameraRenderer_onDrawFrame(JNI
                                                                              jint height) {
     AHardwareBuffer *pBuffer = AHardwareBuffer_fromHardwareBuffer(env, buffer);
 
-    if (nullptr != pBuffer) {
-        if (nullptr != pRenderer) {
+    if (pBuffer) {
+        if (pRenderer) {
             pRenderer->OnDrawFrame(pBuffer, width, height);
         }
     } else {

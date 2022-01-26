@@ -13,9 +13,6 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/ext.hpp"
 
-//#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG,"native-lib",__VA_ARGS__)
-//#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,"native-lib",__VA_ARGS__)
-
 void InitContext(JNIEnv *env, jobject surface);
 GLuint InitShaderProgram(const char* vertexCode, const char* fragCode);
 GLuint LoadShader(const char *code, GLenum type);
@@ -23,6 +20,7 @@ void OnDraw();
 void InitVertex();
 Texture* InitTexture(const char*);
 
+ANativeWindow *pWindow = nullptr;
 bool mbShutDown = false;
 GLuint mShaderProgram;
 EGLSurface mEglSurface;
@@ -114,10 +112,12 @@ Java_com_github_opengles_1android_examples_native_1render_NativeRenderView_init(
         eglSwapBuffers(mDisplay, mEglSurface);
     }
 
+    delete(pTexture);
     glDeleteBuffers(1, &mVAO);
     glDeleteProgram(mShaderProgram);
     eglDestroySurface(mDisplay, mEglSurface);
     eglDestroyContext(mDisplay, mContext);
+    ANativeWindow_release(pWindow);
     mbShutDown = false;
 }
 
@@ -139,7 +139,7 @@ Java_com_github_opengles_1android_examples_native_1render_NativeRenderView_setSu
 void InitContext(JNIEnv *env, jobject surface) {
     EGLint majorVersion;
     EGLint minorVersion;
-    ANativeWindow *window = ANativeWindow_fromSurface(env, surface);
+    pWindow = ANativeWindow_fromSurface(env, surface);
 
     // Create and initialize EGLDisplay
     mDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
@@ -173,7 +173,7 @@ void InitContext(JNIEnv *env, jobject surface) {
         return;
     }
 
-    mEglSurface = eglCreateWindowSurface(mDisplay, config, window, nullptr);
+    mEglSurface = eglCreateWindowSurface(mDisplay, config, pWindow, nullptr);
 
     if (EGL_NO_SURFACE == mEglSurface) {
         EGLint error = eglGetError();
