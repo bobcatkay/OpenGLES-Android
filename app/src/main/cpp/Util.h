@@ -28,8 +28,6 @@ void InitUtil(JNIEnv* env, jobject assetManager);
 
 std::string ReadFileFromAssets(const char* fileName);
 
-void GetAssetPath(char path[], const char* fileName);
-
 uint8_t* ReadDataFromAssets(const char* fileName, int& size);
 
 void InitQuadVAO(GLuint& vao);

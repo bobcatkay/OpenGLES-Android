@@ -89,7 +89,7 @@ public class NativeRenderView extends SurfaceView implements SurfaceHolder.Callb
 
     private String prepareFile() {
         File filesDir = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        String path =  String.format("%s/%s", filesDir.getAbsolutePath(), "/test2.jpg");
+        String path =  String.format("%s/%s", filesDir.getAbsolutePath(), "test2.jpg");
 
         if (new File(path).exists()) {
             return path;

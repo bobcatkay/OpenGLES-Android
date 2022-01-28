@@ -9,15 +9,6 @@ void InitUtil(JNIEnv* env, jobject assetManager) {
     pAssetManager = AAssetManager_fromJava(env, assetManager);
 }
 
-void GetAssetPath(char path[], const char* fileName) {
-    AAsset *asset = AAssetManager_open(pAssetManager, fileName, AASSET_MODE_RANDOM);
-    off64_t offset, length;
-    int fd = AAsset_openFileDescriptor64(asset, &offset, &length);
-    sprintf(path, "/proc/self/fd/%d", fd);
-
-    AAsset_close(asset);
-}
-
 uint8_t* ReadDataFromAssets(const char* fileName, int& size) {
     AAsset *pAsset = AAssetManager_open(pAssetManager, fileName, AASSET_MODE_RANDOM);
     size = AAsset_getLength(pAsset);

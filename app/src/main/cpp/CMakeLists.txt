@@ -15,6 +15,17 @@ ADD_SUBDIRECTORY("${PROJECT_SOURCE_DIR}/glm")
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
+add_library(libffmpeg
+        SHARED
+        IMPORTED
+        )
+
+SET_TARGET_PROPERTIES(
+        libffmpeg
+        PROPERTIES IMPORTED_LOCATION
+        ${PROJECT_SOURCE_DIR}/libs/${ANDROID_ABI}/libffmpeg.so
+)
+include_directories(${PROJECT_SOURCE_DIR}/ffmpeg)
 
 add_library( # Sets the name of the library.
              native-lib
@@ -23,7 +34,7 @@ add_library( # Sets the name of the library.
              SHARED
 
              # Provides a relative path to your source file(s).
-        NativeRenderer.cpp Util.cpp Texture.cpp)
+             NativeRenderer.cpp Util.cpp Texture.cpp)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -68,13 +79,14 @@ target_link_libraries( # Specifies the target library.
         # included in the NDK.
         ${log-lib} )
 
-add_library(yuv_renderer
+add_library(video_renderer
         SHARED
-        YUVRendererJni.cpp YUVRenderer.cpp Shader.cpp Util.cpp Texture.cpp)
+        VideoRendererJni.cpp VideoRenderer.cpp Shader.cpp Util.cpp VideoDecoder.cpp Texture.cpp)
 
 target_link_libraries( # Specifies the target library.
-        yuv_renderer
+        video_renderer
         glm_shared
+        libffmpeg
         GLESv3
         EGL
         android
