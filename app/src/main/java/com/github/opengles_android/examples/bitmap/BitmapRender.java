@@ -33,6 +33,7 @@ public class BitmapRender implements GLSurfaceView.Renderer {
     private Texture mTexture;
     private float mInitialScaleX;
     private float mInitialScaleY;
+    private float mTextureScale;
 
     public BitmapRender(Context context) {
         mContext = context;
@@ -41,7 +42,7 @@ public class BitmapRender implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
         initVertex();
-        mShader = new Shader(mContext, "common.vert", "texture2d.frag");
+        mShader = new Shader(mContext, "bitmap.vert", "texture2d.frag");
         mTexture = Texture.loadFromAssets(mContext, "test.jpg");
     }
 
@@ -89,6 +90,7 @@ public class BitmapRender implements GLSurfaceView.Renderer {
 
         synchronized (this) {
             mShader.setMat4("uTransform", mTransform.getArray());
+            mShader.setFloat("uTextureScale", mTextureScale);
         }
 
         mShader.setMat4("uProjection", mProjectionMatrix.getArray());
@@ -134,6 +136,7 @@ public class BitmapRender implements GLSurfaceView.Renderer {
         mTransform.scale(data.mScaleX, data.mScaleY, 1.0f);
 
         mTransform.scale(mInitialScaleX, mInitialScaleY, 1.0f);
+        mTextureScale = data.mTextureScale;
     }
 
     public void destroy() {

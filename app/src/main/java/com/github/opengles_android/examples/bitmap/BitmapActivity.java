@@ -28,6 +28,7 @@ public class BitmapActivity extends FullScreenActivity implements SeekBar.OnSeek
         mBinding.seekbarRotateX.setOnSeekBarChangeListener(this);
         mBinding.seekbarRotateY.setOnSeekBarChangeListener(this);
         mBinding.seekbarRotateZ.setOnSeekBarChangeListener(this);
+        mBinding.seekbarTextureScale.setOnSeekBarChangeListener(this);
 
         mBinding.glSurfaceView.setEGLContextClientVersion(3);
         mBitmapRender = new BitmapRender(getApplicationContext());
@@ -71,6 +72,10 @@ public class BitmapActivity extends FullScreenActivity implements SeekBar.OnSeek
             case R.id.seekbar_rotate_z:
                 mTransformData.mRotateZ = progress;
                 break;
+
+            case R.id.seekbar_texture_scale:
+                mTransformData.mTextureScale = progress / 100.0f;
+                break;
         }
 
         mBitmapRender.updateTransform(mTransformData);
@@ -99,6 +104,7 @@ public class BitmapActivity extends FullScreenActivity implements SeekBar.OnSeek
         mBinding.seekbarRotateZ.setProgress((int) (mTransformData.mRotateZ * mBinding.seekbarRotateZ.getProgressUnit()));
         mBinding.seekbarScaleX.setProgress((int) (mTransformData.mScaleX * mBinding.seekbarScaleX.getProgressUnit()));
         mBinding.seekbarScaleY.setProgress((int) (mTransformData.mScaleY * mBinding.seekbarScaleY.getProgressUnit()));
+        mBinding.seekbarTextureScale.setProgress((int) (mTransformData.mTextureScale * mBinding.seekbarScaleY.getProgressUnit()));
 
     }
 }

@@ -106,6 +106,20 @@
         android:layout_centerHorizontal="true"
         />
 
+    <com.github.opengles_android.common.NumSeekBar
+        android:id="@+id/seekbar_texture_scale"
+        android:layout_below="@+id/seekbar_rotate_z"
+        android:tooltipText="Texture Scale"
+        android:paddingRight="@dimen/seekbar_padding_right"
+        android:layout_width="@dimen/seekbar_width"
+        android:layout_height="@dimen/seekbar_height"
+        android:progressBackgroundTint="@color/progress_tint"
+        app:progressUnit="100"
+        android:min="-200"
+        android:max="200"
+        android:layout_centerHorizontal="true"
+        />
+
     <Button
         android:text="Reset"
         android:layout_alignParentBottom="true"

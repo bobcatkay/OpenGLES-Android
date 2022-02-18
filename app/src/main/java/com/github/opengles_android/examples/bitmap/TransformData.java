@@ -8,4 +8,5 @@ public class TransformData {
     public int mRotateX = 180;
     public int mRotateY;
     public int mRotateZ;
+    public float mTextureScale = 1.0f;
 }

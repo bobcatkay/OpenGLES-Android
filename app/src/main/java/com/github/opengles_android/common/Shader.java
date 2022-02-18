@@ -70,6 +70,10 @@ public class Shader {
         GLES30.glUniform1i(getUniformLocation(name), value);
     }
 
+    public void setFloat(String name, float value) {
+        GLES30.glUniform1f(getUniformLocation(name), value);
+    }
+
     public void setMat4(String name, float[] value) {
         GLES30.glUniformMatrix4fv(getUniformLocation(name), 1, false, value, 0);
     }
