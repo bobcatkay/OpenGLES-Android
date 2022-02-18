@@ -25,6 +25,7 @@ public class VideoView extends SurfaceView implements SurfaceHolder.Callback {
     private Surface mSurface;
     private int mSurfaceWidth;
     private int mSurfaceHeight;
+    private boolean mbStarted = false;
 
     public VideoView(Context context) {
         this(context, null);
@@ -42,6 +43,7 @@ public class VideoView extends SurfaceView implements SurfaceHolder.Callback {
 
         mSurface = holder.getSurface();
         mVideoPlayThread = new VideoPlayThread();
+        mbStarted = false;
     }
 
     @Override
@@ -50,7 +52,13 @@ public class VideoView extends SurfaceView implements SurfaceHolder.Callback {
 
         mSurfaceWidth = width;
         mSurfaceHeight = height;
-        mVideoPlayThread.start();
+
+        if (!mbStarted) {
+            mVideoPlayThread.start();
+            mbStarted = true;
+        } else {
+            onSurfaceChanged(mSurfaceWidth, mSurfaceHeight);
+        }
     }
 
     @Override
@@ -94,5 +102,6 @@ public class VideoView extends SurfaceView implements SurfaceHolder.Callback {
 
     private native void initDecoder(String videoPath);
     private native void initRenderer(Surface surface, int surfaceWidth, int surfaceHeight, AssetManager assetManager);
+    private native void onSurfaceChanged(int surfaceWidth, int surfaceHeight);
     private native void shutdown();
 }

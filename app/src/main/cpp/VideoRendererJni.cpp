@@ -60,3 +60,13 @@ Java_com_github_opengles_1android_examples_video_VideoView_shutdown(JNIEnv *env,
         pRenderer->Shutdown();
     }
 }
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_github_opengles_1android_examples_video_VideoView_onSurfaceChanged(JNIEnv *env,
+                                                                            jobject thiz,
+                                                                            jint surface_width,
+                                                                            jint surface_height) {
+    if (pRenderer) {
+        pRenderer->OnSurfaceChanged(surface_width, surface_height);
+    }
+}

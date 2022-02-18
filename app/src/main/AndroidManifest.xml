@@ -34,6 +34,7 @@
             android:theme="@style/Theme.OpenGLESAndroid.Fullscreen" />
         <activity
             android:name=".examples.video.VideoActivity"
+            android:configChanges="screenSize|orientation"
             android:theme="@style/Theme.OpenGLESAndroid.Fullscreen" />
     </application>
 
