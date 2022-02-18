@@ -5,7 +5,7 @@
 #include "VideoRenderer.h"
 
 static std::mutex sFrameMutex;
-static std::mutex sMatrixMutex;
+static std::mutex sMutex;
 
 VideoRenderer::VideoRenderer(ANativeWindow *window, int surfaceWidth, int surfaceHeight) {
     pWindow = window;
@@ -34,16 +34,16 @@ void VideoRenderer::Init() {
 }
 
 void VideoRenderer::OnDrawFrame() {
+    sMutex.lock();
     glViewport(0, 0, mWindowWidth, mWindowHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
     pShader->UseProgram();
 
-    sMatrixMutex.lock();
     pShader->SetMat4("uProjection", mProjectionMatrix);
     pShader->SetMat4("uTransform", mTransformMatrix);
-    sMatrixMutex.unlock();
+    sMutex.unlock();
 
     UpdateTexture();
 
@@ -165,9 +165,9 @@ void VideoRenderer::SetVideoSize(int width, int height) {
     mVideoWidth = width;
     mVideoHeight = height;
 
-    sMatrixMutex.lock();
+    sMutex.lock();
     InitMatrix();
-    sMatrixMutex.unlock();
+    sMutex.unlock();
 }
 
 void VideoRenderer::Shutdown() {
@@ -194,4 +194,12 @@ void VideoRenderer::Release() {
     eglDestroySurface(mDisplay, mEglSurface);
     eglDestroyContext(mDisplay, mContext);
     ANativeWindow_release(pWindow);
+}
+
+void VideoRenderer::OnSurfaceChanged(int surfaceWidth, int surfaceHeight) {
+    sMutex.lock();
+    mWindowWidth = surfaceWidth;
+    mWindowHeight = surfaceHeight;
+    InitMatrix();
+    sMutex.unlock();
 }

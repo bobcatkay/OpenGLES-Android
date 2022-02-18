@@ -18,6 +18,7 @@ public:
     void Shutdown();
     void VideoDecodeCallback(AVFrame* frame);
     void SetVideoSize(int width, int height);
+    void OnSurfaceChanged(int surfaceWidth, int surfaceHeight);
 
 private:
     const GLuint VERTEX_COUNT = 6;

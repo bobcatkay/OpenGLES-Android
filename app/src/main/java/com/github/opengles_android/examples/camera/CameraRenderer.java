@@ -5,9 +5,7 @@ import android.content.res.AssetManager;
 import android.hardware.HardwareBuffer;
 import android.media.Image;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
+import android.os.ConditionVariable;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -33,6 +31,7 @@ public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImage
     private ConcurrentLinkedQueue<Buffer> mBufferQueue = new ConcurrentLinkedQueue<>();
     private Buffer mCurrentBuffer;
     private long mLastFrameTime = 0;
+    private ConditionVariable mLock = new ConditionVariable(false);
 
     public CameraRenderer(Activity activity) {
         mActivity = activity;
@@ -69,21 +68,18 @@ public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImage
         mLastFrameTime = System.currentTimeMillis();
 
         while (!mbShutDown) {
-            Buffer buffer = mBufferQueue.poll();
+            mLock.block();
+            mCurrentBuffer = mBufferQueue.poll();
 
-            if (null != buffer) {
-                mCurrentBuffer = buffer;
-            }
-
-            if (null != mCurrentBuffer) {
-                onDrawFrame(mCurrentBuffer.mHardwareBuffer, mCurrentBuffer.mWidth, mCurrentBuffer.mHeight);
-            }
+            onDrawFrame(mCurrentBuffer.mHardwareBuffer, mCurrentBuffer.mWidth, mCurrentBuffer.mHeight);
 
             long curTime = System.currentTimeMillis();
             long frameTime = curTime - mLastFrameTime;
             mLastFrameTime = curTime;
 
             Log.d(TAG, "run, frameTime: " + frameTime);
+
+            mLock.close();
         }
 
         Log.e(TAG, "run, exit.");
@@ -105,6 +101,7 @@ public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImage
         }
 
         mBufferQueue.add(buffer);
+        mLock.open();
 
         Log.d(TAG, "onImageReceived, image size: " + width + "x" + height + ", format: " + image.getFormat());
     }
