@@ -5,9 +5,14 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.SurfaceView;
+import android.view.WindowManager;
 
 import com.github.opengles_android.R;
 import com.github.opengles_android.common.FullScreenActivity;
@@ -17,17 +22,44 @@ public class CameraActivity extends FullScreenActivity {
     private int CODE_PERMISSION_CAMERA;
     private CameraController mCameraController;
     private CameraRenderer mCameraRenderer;
+    private GLSurfaceView mCameraView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
-        SurfaceView cameraView = findViewById(R.id.camera_surface_view);
+        WindowManager.LayoutParams windowAttributes = getWindow().getAttributes();
+        windowAttributes.rotationAnimation = WindowManager.LayoutParams.ROTATION_ANIMATION_SEAMLESS;
+        getWindow().setAttributes(windowAttributes);
+
+        mCameraView = findViewById(R.id.camera_surface_view);
+        mCameraView.setEGLContextClientVersion(3);
         mCameraRenderer = new CameraRenderer(this);
-        cameraView.getHolder().addCallback(mCameraRenderer);
+        mCameraView.setRenderer(mCameraRenderer);
+        mCameraView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
         checkPermission();
+    }
+
+    public GLSurfaceView getSurfaceView() {
+        return mCameraView;
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        mCameraRenderer.onConfigurationChanging();
+        super.onConfigurationChanged(newConfig);
+
+
+        Log.e("CameraActivity", "onConfigurationChanged: " );
+    }
+
+    @Override
+    public boolean isChangingConfigurations() {
+        Log.e("CameraActivity", "isChangingConfigurations: ");
+
+        return super.isChangingConfigurations();
     }
 
     private void initCamera() {

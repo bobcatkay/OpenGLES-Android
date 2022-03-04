@@ -5,6 +5,7 @@
 #include "CameraRenderer.h"
 
 CameraRenderer *pRenderer;
+EGLDisplay mDisplay;
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -45,4 +46,24 @@ Java_com_github_opengles_1android_examples_camera_CameraRenderer_onDrawFrame(JNI
         LOGE("addBuffer, pBuffer is null.");
     }
 
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_github_opengles_1android_examples_camera_CameraRenderer_bindHardwareBuffer(JNIEnv *env,
+                                                                                    jobject thiz,
+                                                                                    jint tex_id,
+                                                                                    jobject buffer,
+                                                                                    jint width,
+                                                                                    jint height) {
+    AHardwareBuffer *pBuffer = AHardwareBuffer_fromHardwareBuffer(env, buffer);
+
+    if (!mDisplay) {
+        mDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    }
+
+    if (pBuffer) {
+        BindHardwareBuffer(tex_id, pBuffer, mDisplay);
+    } else {
+        LOGE("addBuffer, pBuffer is null.");
+    }
 }

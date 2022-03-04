@@ -29,7 +29,7 @@ public class BitmapRender implements GLSurfaceView.Renderer {
     private int mSurfaceHeight;
     private int mVertexCount;
     private Matrix4f mTransform = new Matrix4f();
-    private Matrix4f mProjectionMatrix = new Matrix4f();;
+    private Matrix4f mProjectionMatrix = new Matrix4f();
     private Texture mTexture;
     private float mInitialScaleX;
     private float mInitialScaleY;
