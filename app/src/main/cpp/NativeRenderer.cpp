@@ -12,6 +12,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/ext.hpp"
+#include <thread>
 
 void InitContext(JNIEnv *env, jobject surface);
 GLuint InitShaderProgram(const char* vertexCode, const char* fragCode);
@@ -33,6 +34,110 @@ GLuint mVertexCount = 3;
 const int TEXTURE_UNIT = 1;
 glm::mat4 mProjectionMatrix = glm::mat4(1.0f);
 glm::mat4 mTransformMatrix = glm::mat4(1.0f);
+
+void InitOffScreenContext() {
+    // EGL config attributes
+    const EGLint confAttr[] =
+            {
+                    EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,// very important!
+                    EGL_SURFACE_TYPE,EGL_PBUFFER_BIT,//EGL_WINDOW_BIT EGL_PBUFFER_BIT we will create a pixelbuffer surface
+                    EGL_RED_SIZE,   8,
+                    EGL_GREEN_SIZE, 8,
+                    EGL_BLUE_SIZE,  8,
+                    EGL_ALPHA_SIZE, 8,// if you need the alpha channel
+                    EGL_DEPTH_SIZE, 8,// if you need the depth buffer
+                    EGL_STENCIL_SIZE,8,
+                    EGL_NONE
+            };
+    // EGL context attributes
+    const EGLint ctxAttr[] = {
+            EGL_CONTEXT_CLIENT_VERSION, 2,// very important!
+            EGL_NONE
+    };
+    // surface attributes
+    // the surface size is set to the input frame size
+    const EGLint surfaceAttr[] = {
+            EGL_WIDTH,512,
+            EGL_HEIGHT,512,
+            EGL_NONE
+    };
+    EGLint eglMajVers, eglMinVers;
+    EGLint numConfigs;
+
+    EGLDisplay eglDisp = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    if(eglDisp == EGL_NO_DISPLAY)
+    {
+        //Unable to open connection to local windowing system
+        LOGD("Unable to open connection to local windowing system");
+    }
+    if(!eglInitialize(eglDisp, &eglMajVers, &eglMinVers))
+    {
+        // Unable to initialize EGL. Handle and recover
+        LOGD("Unable to initialize EGL");
+    }
+    LOGD("EGL init with version %d.%d", eglMajVers, eglMinVers);
+    // choose the first config, i.e. best config
+    EGLConfig eglConf;
+    if(!eglChooseConfig(eglDisp, confAttr, &eglConf, 1, &numConfigs))
+    {
+        LOGD("some config is wrong");
+    }
+    else
+    {
+        LOGD("all configs is OK");
+    }
+    // create a pixelbuffer surface
+    EGLSurface eglSurface = eglCreatePbufferSurface(eglDisp, eglConf, surfaceAttr);
+    if(eglSurface == EGL_NO_SURFACE)
+    {
+        switch(eglGetError())
+        {
+            case EGL_BAD_ALLOC:
+                // Not enough resources available. Handle and recover
+                LOGD("Not enough resources available");
+                break;
+            case EGL_BAD_CONFIG:
+                // Verify that provided EGLConfig is valid
+                LOGD("provided EGLConfig is invalid");
+                break;
+            case EGL_BAD_PARAMETER:
+                // Verify that the EGL_WIDTH and EGL_HEIGHT are
+                // non-negative values
+                LOGD("provided EGL_WIDTH and EGL_HEIGHT is invalid");
+                break;
+            case EGL_BAD_MATCH:
+                // Check window and EGLConfig attributes to determine
+                // compatibility and pbuffer-texture parameters
+                LOGD("Check window and EGLConfig attributes");
+                break;
+        }
+    }
+    EGLContext eglCtx = eglCreateContext(eglDisp, eglConf, mContext, ctxAttr);
+    if(eglCtx == EGL_NO_CONTEXT)
+    {
+        EGLint error = eglGetError();
+        if(error == EGL_BAD_CONFIG)
+        {
+            // Handle error and recover
+            LOGD("EGL_BAD_CONFIG");
+        }
+    }
+    if(!eglMakeCurrent(eglDisp, eglSurface, eglSurface, eglCtx))
+    {
+        LOGD("MakeCurrent failed");
+    }
+    LOGD("initialize success!");
+}
+
+void PrepareTexture(const char* path, Texture* texture) {
+    InitOffScreenContext();
+    Texture *pTexture = InitTexture(path);
+    texture->id = pTexture->id;
+    texture->unit = pTexture->unit;
+    texture->width = pTexture->width;
+    texture->height = pTexture->height;
+    texture->format = pTexture->format;
+}
 
 
 void InitMatrix(int texWidth, int texHeight) {
@@ -77,13 +182,17 @@ Java_com_github_opengles_1android_examples_native_1render_NativeRenderView_init(
     // Init EGL context
     InitContext(env, surface);
 
-    InitVertex();
-
     const char *filePath = env->GetStringUTFChars(file_path, nullptr);
-    Texture *pTexture = InitTexture(filePath);
+    Texture pTexture;
+    std::thread tTex(PrepareTexture, filePath, &pTexture);
+    tTex.join();
     env->ReleaseStringUTFChars(file_path, filePath);
 
-    InitMatrix(pTexture->width, pTexture->height);
+    InitVertex();
+
+    LOGD("init, pTexture: %s.", pTexture.ToString());
+
+    InitMatrix(pTexture.width, pTexture.height);
 
     // Init shader mShaderProgram
     const char *vertexCode = env->GetStringUTFChars(vertex_code, nullptr);
@@ -97,8 +206,8 @@ Java_com_github_opengles_1android_examples_native_1render_NativeRenderView_init(
     }
 
     glUseProgram(mShaderProgram);
-    glUniform1i(glGetUniformLocation(mShaderProgram, "uTexture"), pTexture->unit);
-    pTexture->ActiveTexture();
+    glUniform1i(glGetUniformLocation(mShaderProgram, "uTexture"), pTexture.unit);
+    pTexture.ActiveTexture();
     glUniformMatrix4fv(glGetUniformLocation(mShaderProgram, "uTransform"), 1, GL_FALSE, glm::value_ptr(mTransformMatrix));
     glUniformMatrix4fv(glGetUniformLocation(mShaderProgram, "uProjection"), 1, GL_FALSE, glm::value_ptr(mProjectionMatrix));
 
@@ -112,7 +221,6 @@ Java_com_github_opengles_1android_examples_native_1render_NativeRenderView_init(
         eglSwapBuffers(mDisplay, mEglSurface);
     }
 
-    delete(pTexture);
     glDeleteBuffers(1, &mVAO);
     glDeleteProgram(mShaderProgram);
     eglDestroySurface(mDisplay, mEglSurface);

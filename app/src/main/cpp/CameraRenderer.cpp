@@ -13,16 +13,7 @@ CameraRenderer::CameraRenderer(ANativeWindow *window, int surfaceWidth, int surf
 }
 
 void CameraRenderer::Init() {
-    mProjectionMatrix = glm::mat4(1.0f);
-    float aspectRatio = mWindowWidth > mWindowHeight ?
-                        (float) mWindowWidth / (float) mWindowHeight :
-                        (float) mWindowHeight / (float) mWindowWidth;
-
-    if (mWindowWidth > mWindowHeight) {
-        mProjectionMatrix = glm::ortho(-aspectRatio, aspectRatio, -1.0f, 1.0f, -1.0f, 1.0f);
-    } else {
-        mProjectionMatrix = glm::ortho(-1.0f, 1.0f, -aspectRatio, aspectRatio, -1.0f, 1.0f);
-    }
+    UpdateProjection();
 
     InitContext(mDisplay, pWindow, mEglSurface, mContext);
 
@@ -44,21 +35,7 @@ void CameraRenderer::UpdateTexture(AHardwareBuffer* buffer, int width, int heigh
     if ((mLastBufferWidth != width) || (mLastBufferHeight != height)) {
         mLastBufferWidth = width;
         mLastBufferHeight = height;
-        mTransformMatrix = glm::mat4(1.0f);
-        float scaleY = 1.0f;
-        float scaleX = 1.0f;
-
-        if (mWindowHeight > mWindowWidth) {
-            scaleY = (float) height / width;
-        } else {
-            scaleX = (float) width / height;
-        }
-
-        LOGD("UpdateTexture, mWindowWidth: %d, mWindowHeight: %d, width: %d, height: %d, scaleX: %.1f, scaleY: %.1f.",
-             mWindowWidth, mWindowHeight, width, height, scaleX, scaleY);
-
-        mTransformMatrix = glm::scale(mTransformMatrix, glm::vec3(scaleX, scaleY, 1.0f));
-        mTransformMatrix = glm::rotate(mTransformMatrix, glm::radians(270.0f), glm::vec3(0, 0, 1.0f));
+        UpdateTransform();
     }
 
     BindHardwareBuffer(mTexId, buffer, mDisplay);
@@ -67,7 +44,7 @@ void CameraRenderer::UpdateTexture(AHardwareBuffer* buffer, int width, int heigh
 void CameraRenderer::OnDrawFrame(AHardwareBuffer *buffer, int width, int height) {
     glViewport(0, 0, mWindowWidth, mWindowHeight);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0f,0.0f,0.0f,1.0f);
+    glClearColor(1.0f, 1.0f, 1.0f,1.0f);
 
     UpdateTexture(buffer, width, height);
 
@@ -95,5 +72,67 @@ void CameraRenderer::Release() {
     eglDestroySurface(mDisplay, mEglSurface);
     eglDestroyContext(mDisplay, mContext);
     ANativeWindow_release(pWindow);
+}
+
+void CameraRenderer::UpdateProjection() {
+    mProjectionMatrix = glm::mat4(1.0f);
+    float aspectRatio = mWindowWidth > mWindowHeight ?
+                        (float) mWindowWidth / (float) mWindowHeight :
+                        (float) mWindowHeight / (float) mWindowWidth;
+
+    if (0 == mRotation) {
+        if (mWindowWidth > mWindowHeight) {
+            mProjectionMatrix = glm::ortho(-aspectRatio, aspectRatio, -1.0f, 1.0f, -1.0f, 1.0f);
+        } else {
+            mProjectionMatrix = glm::ortho(-1.0f, 1.0f, -aspectRatio, aspectRatio, -1.0f, 1.0f);
+        }
+    } else {
+        if (mWindowWidth > mWindowHeight) {
+            mProjectionMatrix = glm::ortho(-1.0f, 1.0f, -aspectRatio, aspectRatio, -1.0f, 1.0f);
+        } else {
+            mProjectionMatrix = glm::ortho(-aspectRatio, aspectRatio, -1.0f, 1.0f, -1.0f, 1.0f);
+        }
+    }
+}
+
+void CameraRenderer::OnSurfaceChanged(int width, int height, int rotation) {
+    LOGD("OnSurfaceChanged, width: %d, height: %d, rotation: %d", width, height, rotation);
+
+    mWindowWidth = width;
+    mWindowHeight = height;
+    mRotation = rotation;
+    UpdateProjection();
+    UpdateTransform();
+}
+
+void CameraRenderer::UpdateTransform() {
+    mTransformMatrix = glm::mat4(1.0f);
+    float scaleY = 1.0f;
+    float scaleX = 1.0f;
+
+    if (0 == mRotation) {
+        if (mWindowHeight > mWindowWidth) {
+            scaleY = (float) mLastBufferHeight / mLastBufferWidth;
+        } else {
+            scaleX = (float) mLastBufferWidth / mLastBufferHeight;
+        }
+    } else {
+        if (mWindowHeight > mWindowWidth) {
+            scaleX = (float) mLastBufferHeight / mLastBufferWidth;
+        } else {
+            scaleY = (float) mLastBufferWidth / mLastBufferHeight;
+        }
+    }
+
+    LOGD("UpdateTexture, mWindowWidth: %d, mWindowHeight: %d, width: %d, height: %d, scaleX: %.1f, scaleY: %.1f.",
+         mWindowWidth, mWindowHeight, mLastBufferWidth, mLastBufferHeight, scaleX, scaleY);
+
+    mTransformMatrix = glm::scale(mTransformMatrix, glm::vec3(scaleX, scaleY, 1.0f));
+
+    if (mRotation == 0) {
+        mTransformMatrix = glm::rotate(mTransformMatrix, glm::radians(270.0f), glm::vec3(0, 0, 1.0f));
+    } else if (mRotation == 3) {
+        mTransformMatrix = glm::rotate(mTransformMatrix, glm::radians(180.0f), glm::vec3(0, 0, 1.0f));
+    }
 }
 

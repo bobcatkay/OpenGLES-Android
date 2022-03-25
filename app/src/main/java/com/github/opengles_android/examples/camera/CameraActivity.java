@@ -6,28 +6,52 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.graphics.RenderNode;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.Size;
 import android.view.SurfaceView;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.RelativeLayout;
 
 import com.github.opengles_android.R;
 import com.github.opengles_android.common.FullScreenActivity;
+import com.github.opengles_android.common.Utils;
 
 public class CameraActivity extends FullScreenActivity {
 
     private int CODE_PERMISSION_CAMERA;
     private CameraController mCameraController;
     private CameraRenderer mCameraRenderer;
+    private SurfaceView mCameraView;
+    private Size mScreenResolution;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
-        SurfaceView cameraView = findViewById(R.id.camera_surface_view);
+        mCameraView = findViewById(R.id.camera_surface_view);
         mCameraRenderer = new CameraRenderer(this);
-        cameraView.getHolder().addCallback(mCameraRenderer);
+        mCameraView.getHolder().addCallback(mCameraRenderer);
+        mScreenResolution = Utils.getScreenResolution(this);
+        mCameraView.getHolder().setFixedSize(mScreenResolution.getWidth(), mScreenResolution.getHeight());
+
+        WindowManager.LayoutParams windowAttributes = getWindow().getAttributes();
+        windowAttributes.rotationAnimation = WindowManager.LayoutParams.ROTATION_ANIMATION_SEAMLESS;
+        getWindow().setAttributes(windowAttributes);
 
         checkPermission();
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mCameraRenderer.onConfigurationChange();
+
+        Log.e("CameraActivity", "onConfigurationChanged, newConfig: " + newConfig.orientation);
     }
 
     private void initCamera() {

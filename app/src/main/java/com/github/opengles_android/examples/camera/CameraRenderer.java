@@ -2,15 +2,20 @@ package com.github.opengles_android.examples.camera;
 
 import android.app.Activity;
 import android.content.res.AssetManager;
+import android.graphics.Rect;
 import android.hardware.HardwareBuffer;
 import android.media.Image;
+import android.opengl.EGL14;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
+import android.util.Size;
 import android.view.Surface;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.View;
+
+import com.github.opengles_android.R;
+import com.github.opengles_android.common.Utils;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -33,27 +38,68 @@ public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImage
     private ConcurrentLinkedQueue<Buffer> mBufferQueue = new ConcurrentLinkedQueue<>();
     private Buffer mCurrentBuffer;
     private long mLastFrameTime = 0;
+    private int mScreenWidth;
+    private int mScreenHeight;
+    private boolean mbConfigurationChanged = false;
+    private SurfaceHolder mSurfaceHolder = null;
+    private int mCount = 2;
+    private final SurfaceView mSurfaceView;
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     public CameraRenderer(Activity activity) {
         mActivity = activity;
+        mSurfaceView = mActivity.findViewById(R.id.camera_surface_view);
+        Size screenResolution = Utils.getScreenResolution(activity);
+        mScreenWidth = screenResolution.getWidth();
+        mScreenHeight = screenResolution.getHeight();
+        mSurfaceView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                Log.e(TAG, "onLayoutChange: ");
+
+//                synchronized (CameraRenderer.this) {
+//                    mbConfigurationChanged = true;
+//                }
+            }
+        });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
         Log.e(TAG, "surfaceCreated");
 
         mbShutDown = false;
+        mbStarted = false;
         mSurface = holder.getSurface();
         mGLThread = new Thread(this);
+        mRotation = mActivity.getDisplay().getRotation();
+        mSurfaceHolder = holder;
     }
 
+    private Rect mSurfaceFrame;
+    private boolean mbStarted = false;
+    private int mRotation = 0;
+    private int mViewWidth = 0;
+    @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
-        Log.e(TAG, "surfaceChanged: width: " + width + ", height: " + height);
+        Log.e(TAG, "surfaceChanged: width: " + width + ", height: " + height + ", rotation: " + mRotation + ", tid: " + Thread.currentThread().getId());
 
-        mSurfaceWidth = width;
+        int rotation = mActivity.getDisplay().getRotation();
+        //onSurfaceChanged(width, height, rotation);
         mSurfaceHeight = height;
-        mGLThread.start();
+        mSurfaceWidth = width;
+
+        if (!mbStarted) {
+            mGLThread.start();
+            mbStarted = true;
+        }
+
+        if (mCount > 2) {
+            mCount = 0;
+        }
+
     }
 
     @Override
@@ -63,6 +109,7 @@ public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImage
         mbShutDown = true;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     public void run() {
         init(mSurface, mSurfaceWidth, mSurfaceHeight, mActivity.getAssets());
@@ -75,7 +122,28 @@ public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImage
                 mCurrentBuffer = buffer;
             }
 
+            int rotation = mActivity.getDisplay().getRotation();
+            int viewWidth = mSurfaceView.getWidth();
+
+            if (rotation != mRotation) {
+                Log.d(TAG, "run, mRotation change, rotation: " + rotation + ", surfaceFrame: " + surfaceFrame.toShortString());
+                mRotation = rotation;
+                mViewWidth = viewWidth;
+                //onSurfaceChanged(mScreenWidth, mScreenHeight, rotation);
+            }
+
+
+            synchronized (this) {
+                if (mbConfigurationChanged) {
+                    Log.d(TAG, "run, mbConfigurationChanged, rotation: " + rotation + ", surfaceFrame: " + surfaceFrame.toShortString());
+
+                    onSurfaceChanged(mScreenWidth, mScreenHeight, rotation);
+                    mbConfigurationChanged = false;
+                }
+            }
+
             if (null != mCurrentBuffer) {
+                mCount ++;
                 onDrawFrame(mCurrentBuffer.mHardwareBuffer, mCurrentBuffer.mWidth, mCurrentBuffer.mHeight);
             }
 
@@ -83,7 +151,7 @@ public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImage
             long frameTime = curTime - mLastFrameTime;
             mLastFrameTime = curTime;
 
-            Log.d(TAG, "run, frameTime: " + frameTime);
+            //Log.d(TAG, "run, frameTime: " + frameTime + ", tid: " + Thread.currentThread().getId());
         }
 
         Log.e(TAG, "run, exit.");
@@ -109,8 +177,13 @@ public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImage
         Log.d(TAG, "onImageReceived, image size: " + width + "x" + height + ", format: " + image.getFormat());
     }
 
+    public synchronized void onConfigurationChange() {
+        mbConfigurationChanged = true;
+    }
+
     private native void init(Surface surface, int surfaceWidth, int surfaceHeight, AssetManager assetManager);
     private native void onDrawFrame(HardwareBuffer buffer, int width, int height);
+    private native void onSurfaceChanged(int width, int height, int rotation);
     private native void release();
 
     static class Buffer {
