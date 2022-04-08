@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Size;
 import android.view.SurfaceView;
@@ -54,6 +55,15 @@ public class CameraActivity extends FullScreenActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CODE_PERMISSION_CAMERA);
         } else {
             initCamera();
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        if (mCameraRenderer != null) {
+            mCameraRenderer.onConfigurationChanged();
         }
     }
 

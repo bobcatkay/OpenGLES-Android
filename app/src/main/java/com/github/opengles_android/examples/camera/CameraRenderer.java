@@ -6,6 +6,7 @@ import android.hardware.HardwareBuffer;
 import android.media.Image;
 import android.os.Build;
 import android.os.ConditionVariable;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -33,6 +34,9 @@ public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImage
     private long mLastFrameTime = 0;
     private ConditionVariable mLock = new ConditionVariable(false);
     private boolean mbStarted = false;
+    private int mRotation;
+    private boolean mbSurfaceChanged = false;
+    private boolean mbConfigurationChanged = false;
 
     public CameraRenderer(Activity activity) {
         mActivity = activity;
@@ -47,6 +51,17 @@ public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImage
         mGLThread = new Thread(this);
     }
 
+    public void onConfigurationChanged() {
+        synchronized (this) {
+            mbConfigurationChanged = true;
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    private int getDisplayRotation() {
+        return mActivity.getDisplay().getRotation();
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
@@ -54,8 +69,13 @@ public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImage
 
         mSurfaceWidth = width;
         mSurfaceHeight = height;
-        int rotation = mActivity.getDisplay().getRotation();
-        onSurfaceChanged(width, height, rotation);
+        int rotation = getDisplayRotation();
+        //onSurfaceChanged(mSurfaceWidth, mSurfaceHeight, rotation);
+
+
+        synchronized (this) {
+            mbSurfaceChanged = true;
+        }
 
         if (!mbStarted) {
             mGLThread.start();
@@ -70,14 +90,30 @@ public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImage
         mbShutDown = true;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     public void run() {
         init(mSurface, mSurfaceWidth, mSurfaceHeight, mActivity.getAssets());
+        setTextureStoreDir(mActivity.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath());
         mLastFrameTime = System.currentTimeMillis();
 
         while (!mbShutDown) {
             mLock.block();
             mCurrentBuffer = mBufferQueue.poll();
+
+            int rotation = getDisplayRotation();
+
+            if (mRotation != rotation) {
+                beginDump();
+                mRotation = rotation;
+            }
+
+            synchronized (this) {
+                if (mbSurfaceChanged) {
+                    onSurfaceChanged(mSurfaceWidth, mSurfaceHeight, rotation);
+                    mbSurfaceChanged = false;
+                }
+            }
 
             onDrawFrame(mCurrentBuffer.mHardwareBuffer, mCurrentBuffer.mWidth, mCurrentBuffer.mHeight);
 
@@ -118,6 +154,8 @@ public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImage
     private native void onDrawFrame(HardwareBuffer buffer, int width, int height);
     private native void onSurfaceChanged(int width, int height, int rotation);
     private native void release();
+    private native void setTextureStoreDir(String dir);
+    private native void beginDump();
 
     static class Buffer {
         public HardwareBuffer mHardwareBuffer;

@@ -5,8 +5,12 @@ precision mediump float;
 
 in vec2 vTexCoords;
 uniform samplerExternalOES uTexture;
+uniform int mRotation;
 out vec4 FragColor;
 
 void main() {
-    FragColor = texture(uTexture, vTexCoords);
+    float r = mRotation == 0 ? 0.2 : 0.0;
+    float g = mRotation == 0 ? 0.0 : 0.2;
+    vec4 mask = vec4(r, g, 0.0, 0.0);
+    FragColor = texture(uTexture, vTexCoords) + mask;
 }

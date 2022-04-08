@@ -57,3 +57,21 @@ Java_com_github_opengles_1android_examples_camera_CameraRenderer_onSurfaceChange
         pRenderer->OnSurfaceChanged(width, height, rotation);
     }
 }
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_github_opengles_1android_examples_camera_CameraRenderer_setTextureStoreDir(JNIEnv *env,
+                                                                                    jobject thiz,
+                                                                                    jstring dir_) {
+    if (pRenderer) {
+        const char *dir = env->GetStringUTFChars(dir_, nullptr);
+        pRenderer->SetTextureStoreDir(dir);
+    }
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_github_opengles_1android_examples_camera_CameraRenderer_beginDump(JNIEnv *env,
+                                                                           jobject thiz) {
+    if (pRenderer) {
+        pRenderer->BeginDump();
+    }
+}

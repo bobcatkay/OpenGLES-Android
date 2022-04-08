@@ -66,7 +66,7 @@ target_link_libraries( # Specifies the target library.
 
 add_library(camera_renderer
         SHARED
-        CameraRendererJni.cpp CameraRenderer.cpp Shader.cpp Util.cpp)
+        CameraRendererJni.cpp CameraRenderer.cpp Shader.cpp Util.cpp Texture.cpp)
 
 target_link_libraries( # Specifies the target library.
         camera_renderer
