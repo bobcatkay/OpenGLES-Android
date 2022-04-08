@@ -46,3 +46,14 @@ Java_com_github_opengles_1android_examples_camera_CameraRenderer_onDrawFrame(JNI
     }
 
 }
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_github_opengles_1android_examples_camera_CameraRenderer_onSurfaceChanged(JNIEnv *env,
+                                                                                  jobject thiz,
+                                                                                  jint width,
+                                                                                  jint height,
+                                                                                  jint rotation) {
+    if (pRenderer) {
+        pRenderer->OnSurfaceChanged(width, height, rotation);
+    }
+}

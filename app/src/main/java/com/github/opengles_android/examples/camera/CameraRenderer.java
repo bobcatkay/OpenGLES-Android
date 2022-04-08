@@ -32,6 +32,7 @@ public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImage
     private Buffer mCurrentBuffer;
     private long mLastFrameTime = 0;
     private ConditionVariable mLock = new ConditionVariable(false);
+    private boolean mbStarted = false;
 
     public CameraRenderer(Activity activity) {
         mActivity = activity;
@@ -46,13 +47,20 @@ public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImage
         mGLThread = new Thread(this);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
         Log.e(TAG, "surfaceChanged: width: " + width + ", height: " + height);
 
         mSurfaceWidth = width;
         mSurfaceHeight = height;
-        mGLThread.start();
+        int rotation = mActivity.getDisplay().getRotation();
+        onSurfaceChanged(width, height, rotation);
+
+        if (!mbStarted) {
+            mGLThread.start();
+            mbStarted = true;
+        }
     }
 
     @Override
@@ -108,6 +116,7 @@ public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImage
 
     private native void init(Surface surface, int surfaceWidth, int surfaceHeight, AssetManager assetManager);
     private native void onDrawFrame(HardwareBuffer buffer, int width, int height);
+    private native void onSurfaceChanged(int width, int height, int rotation);
     private native void release();
 
     static class Buffer {

@@ -7,10 +7,13 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Size;
 import android.view.SurfaceView;
+import android.view.WindowManager;
 
 import com.github.opengles_android.R;
 import com.github.opengles_android.common.FullScreenActivity;
+import com.github.opengles_android.common.Utils;
 
 public class CameraActivity extends FullScreenActivity {
 
@@ -23,9 +26,16 @@ public class CameraActivity extends FullScreenActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
+        WindowManager.LayoutParams windowAttributes = getWindow().getAttributes();
+        windowAttributes.rotationAnimation = WindowManager.LayoutParams.ROTATION_ANIMATION_SEAMLESS;
+        getWindow().setAttributes(windowAttributes);
+
         SurfaceView cameraView = findViewById(R.id.camera_surface_view);
         mCameraRenderer = new CameraRenderer(this);
         cameraView.getHolder().addCallback(mCameraRenderer);
+
+        Size screenResolution = Utils.getScreenResolution(this);
+        cameraView.getHolder().setFixedSize(screenResolution.getHeight(), screenResolution.getWidth());
 
         checkPermission();
     }

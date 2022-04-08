@@ -30,7 +30,9 @@
             android:theme="@style/Theme.OpenGLESAndroid.Fullscreen" />
         <activity
             android:name=".examples.camera.CameraActivity"
-            android:screenOrientation="portrait"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|uiMode"
+            android:screenOrientation="sensor"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan"
             android:theme="@style/Theme.OpenGLESAndroid.Fullscreen" />
         <activity
             android:name=".examples.video.VideoActivity"

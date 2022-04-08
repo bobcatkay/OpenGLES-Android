@@ -15,6 +15,7 @@ public:
     ~CameraRenderer() {};
 
     void OnDrawFrame(AHardwareBuffer* buffer, int width, int height);
+    void OnSurfaceChanged(int width, int height, int rotation);
     void Release();
 
 private:
@@ -33,9 +34,12 @@ private:
     GLuint mLastBufferHeight = 0;
     glm::mat4 mProjectionMatrix = glm::mat4(1.0f);
     glm::mat4 mTransformMatrix = glm::mat4(1.0f);
+    GLint mRotation = 0;
 
     void UpdateTexture(AHardwareBuffer* buffer, int width, int height);
     void Init();
+    void UpdateProjection();
+    void UpdateTransform();
 };
 
 
