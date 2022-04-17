@@ -2,12 +2,10 @@ package com.github.opengles_android.examples.triangle;
 
 import android.content.Context;
 import android.opengl.GLES20;
-import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 import android.util.Size;
 
-import com.github.opengles_android.common.Shader;
 import com.github.opengles_android.common.Utils;
 
 import java.nio.FloatBuffer;
@@ -15,6 +13,7 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import static android.opengl.GLES30.*;
 import static com.github.opengles_android.common.Utils.FLOAT_SIZE;
 
 public class TriangleRender implements GLSurfaceView.Renderer {
@@ -22,10 +21,11 @@ public class TriangleRender implements GLSurfaceView.Renderer {
 
     private int[] mVAO;
     private Context mContext;
-    private Shader mTriangleShader;
     private int mScreenWidth;
     private int mScreenHeight;
     private int mVertexCount;
+    private int mShaderProgram;
+    long mStartTime;
 
     public TriangleRender(Context context) {
         mContext = context;
@@ -37,7 +37,8 @@ public class TriangleRender implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
         initVertex();
-        mTriangleShader = new Shader(mContext, "triangle.vert", "triangle.frag");
+        initShader("triangle.vert", "triangle.frag");
+        mStartTime = System.currentTimeMillis();
     }
 
     @Override
@@ -47,18 +48,20 @@ public class TriangleRender implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 gl10) {
-        GLES30.glViewport(0, 0, mScreenWidth, mScreenHeight);
+        glViewport(0, 0, mScreenWidth, mScreenHeight);
 
-        GLES30.glClearColor(1f, 1f, 1f, 0f);
-        GLES30.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        glClearColor(1f, 1f, 1f, 0f);
+        glClear(GL_COLOR_BUFFER_BIT);
 
-        mTriangleShader.use();
-        GLES30.glBindVertexArray(mVAO[0]);
-        GLES30.glDrawArrays(GLES20.GL_TRIANGLES, 0, mVertexCount);
+        glUseProgram(mShaderProgram);
+        float elapseTime = (System.currentTimeMillis() - mStartTime) / 1000.0f;
+        glUniform1f(glGetUniformLocation(mShaderProgram, "time"), elapseTime);
+        glBindVertexArray(mVAO[0]);
+        glDrawArrays(GL_TRIANGLES, 0, mVertexCount);
     }
 
     private void initVertex() {
-        Log.d(TAG, "InitVertex: ");
+        Log.d(TAG, "InitVertex");
 
         float vertices[] = {
                 // positions       //color
@@ -72,17 +75,64 @@ public class TriangleRender implements GLSurfaceView.Renderer {
 
         mVAO = new int[1];
         int[] vbo = new int[1];
-        GLES30.glGenVertexArrays(1, mVAO, 0);
-        GLES30.glBindVertexArray(mVAO[0]);
+        glGenVertexArrays(1, mVAO, 0);
+        glBindVertexArray(mVAO[0]);
 
-        GLES30.glGenBuffers(1, vbo, 0);
-        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, vbo[0]);
+        glGenBuffers(1, vbo, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
         int size = vertexBuffer.capacity() * FLOAT_SIZE;
-        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER, size, vertexBuffer, GLES20.GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, size, vertexBuffer, GLES20.GL_STATIC_DRAW);
 
-        GLES30.glEnableVertexAttribArray(0);
-        GLES30.glVertexAttribPointer(0, 3, GLES30.GL_FLOAT, true, 6 * FLOAT_SIZE, 0);
-        GLES30.glEnableVertexAttribArray(1);
-        GLES30.glVertexAttribPointer(1, 3, GLES30.GL_FLOAT, true, 6 * FLOAT_SIZE, 3 * FLOAT_SIZE);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, true, 6 * FLOAT_SIZE, 0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, true, 6 * FLOAT_SIZE, 3 * FLOAT_SIZE);
+    }
+
+    private void initShader(String vertexFileName, String fragmentFileName) {
+        String vertexCode = Utils.getStringFromAssets(mContext, vertexFileName);
+        String fragCode = Utils.getStringFromAssets(mContext, fragmentFileName);
+        int vertexShader = loadShader(vertexCode, GL_VERTEX_SHADER);
+        int fragShader = loadShader(fragCode, GL_FRAGMENT_SHADER);
+
+        mShaderProgram = glCreateProgram();
+
+        if (0 == mShaderProgram) {
+            Log.e(TAG, "createProgram: Create mShaderProgram error!", new Throwable());
+
+            return;
+        }
+
+        glAttachShader(mShaderProgram, vertexShader);
+        glAttachShader(mShaderProgram, fragShader);
+
+        glLinkProgram(mShaderProgram);
+
+        int[] result = new int[1];
+        glGetProgramiv(mShaderProgram, GL_LINK_STATUS, result, 0);
+
+        if (0 == result[0]) {
+            String log = glGetProgramInfoLog(mShaderProgram);
+            Log.e(TAG, "loadShader: Link mShaderProgram error!" + log, new Throwable());
+        }
+    }
+
+    private int loadShader(String code, int type) {
+        int shader = glCreateShader(type);
+        glShaderSource(shader, code);
+        glCompileShader(shader);
+
+        int[] result = new int[1];
+        glGetShaderiv(shader, GL_COMPILE_STATUS, result, 0);
+
+        if (0 == result[0]) {
+            String log = glGetShaderInfoLog(shader);
+            Log.e(TAG, "loadShader: Compile shader error!\n"
+                    + "code: " + code + "\n"
+                    + log, new Throwable());
+            return 0;
+        }
+
+        return shader;
     }
 }
