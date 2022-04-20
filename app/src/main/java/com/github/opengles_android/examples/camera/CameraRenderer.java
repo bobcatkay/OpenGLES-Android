@@ -104,7 +104,6 @@ public class CameraRenderer implements SurfaceHolder.Callback, Runnable, OnImage
             int rotation = getDisplayRotation();
 
             if (mRotation != rotation) {
-                beginDump();
                 mRotation = rotation;
             }
 
