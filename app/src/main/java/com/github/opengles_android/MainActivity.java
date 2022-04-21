@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.github.opengles_android.databinding.ActivityMainBinding;
-import com.github.opengles_android.examples.bitmap.BitmapActivity;
+import com.github.opengles_android.examples.image.ImageActivity;
 import com.github.opengles_android.examples.camera.CameraActivity;
 import com.github.opengles_android.examples.native_render.NativeRenderActivity;
 import com.github.opengles_android.examples.triangle.TriangleActivity;
@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(binding.getRoot());
 
         binding.buttonTriangle.setOnClickListener(this);
-        binding.buttonBitmap.setOnClickListener(this);
+        binding.buttonImage.setOnClickListener(this);
         binding.buttonNativeRender.setOnClickListener(this);
         binding.buttonCamera.setOnClickListener(this);
         binding.buttonVideo.setOnClickListener(this);
@@ -38,8 +38,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 goToActivity(TriangleActivity.class);
                 break;
 
-            case R.id.button_bitmap:
-                goToActivity(BitmapActivity.class);
+            case R.id.button_image:
+                goToActivity(ImageActivity.class);
                 break;
 
             case R.id.button_native_render:

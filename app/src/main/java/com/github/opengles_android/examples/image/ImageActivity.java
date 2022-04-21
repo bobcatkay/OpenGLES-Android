@@ -1,4 +1,4 @@
-package com.github.opengles_android.examples.bitmap;
+package com.github.opengles_android.examples.image;
 
 import android.os.Bundle;
 import android.view.View;
@@ -8,9 +8,9 @@ import com.github.opengles_android.R;
 import com.github.opengles_android.common.FullScreenActivity;
 import com.github.opengles_android.databinding.ActivityBitmapBinding;
 
-public class BitmapActivity extends FullScreenActivity implements SeekBar.OnSeekBarChangeListener {
+public class ImageActivity extends FullScreenActivity implements SeekBar.OnSeekBarChangeListener {
 
-    private BitmapRender mBitmapRender;
+    private ImageRender mImageRender;
     private ActivityBitmapBinding mBinding;
     private TransformData mTransformData = new TransformData();
 
@@ -31,15 +31,15 @@ public class BitmapActivity extends FullScreenActivity implements SeekBar.OnSeek
         mBinding.seekbarTextureScale.setOnSeekBarChangeListener(this);
 
         mBinding.glSurfaceView.setEGLContextClientVersion(3);
-        mBitmapRender = new BitmapRender(getApplicationContext());
-        mBinding.glSurfaceView.setRenderer(mBitmapRender);
+        mImageRender = new ImageRender(getApplicationContext());
+        mBinding.glSurfaceView.setRenderer(mImageRender);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        mBitmapRender.destroy();
+        mImageRender.destroy();
     }
 
     @Override
@@ -78,7 +78,7 @@ public class BitmapActivity extends FullScreenActivity implements SeekBar.OnSeek
                 break;
         }
 
-        mBitmapRender.updateTransform(mTransformData);
+        mImageRender.updateTransform(mTransformData);
     }
 
     @Override

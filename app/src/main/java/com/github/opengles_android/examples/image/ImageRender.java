@@ -1,4 +1,4 @@
-package com.github.opengles_android.examples.bitmap;
+package com.github.opengles_android.examples.image;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
@@ -15,8 +15,8 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import static android.opengl.GLES30.*;
 
-public class BitmapRender implements GLSurfaceView.Renderer {
-    private final static String TAG = "BitmapRender";
+public class ImageRender implements GLSurfaceView.Renderer {
+    private final static String TAG = "ImageRender";
 
     private final static int FLOAT_SIZE = Float.SIZE / Byte.SIZE;
     private int[] mVAO;
@@ -32,7 +32,7 @@ public class BitmapRender implements GLSurfaceView.Renderer {
     private float mInitialScaleY;
     private float mTextureScale;
 
-    public BitmapRender(Context context) {
+    public ImageRender(Context context) {
         mContext = context;
     }
 

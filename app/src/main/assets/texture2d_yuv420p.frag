@@ -1,6 +1,6 @@
 #version 300 es
 
-precision highp float;
+precision mediump float;
 
 uniform sampler2D yTex;
 uniform sampler2D uTex;

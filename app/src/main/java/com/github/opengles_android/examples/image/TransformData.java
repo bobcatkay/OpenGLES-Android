@@ -1,4 +1,4 @@
-package com.github.opengles_android.examples.bitmap;
+package com.github.opengles_android.examples.image;
 
 public class TransformData {
     public float mTranslateX;
