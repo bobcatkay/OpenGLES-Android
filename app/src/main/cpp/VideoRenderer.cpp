@@ -51,12 +51,6 @@ void VideoRenderer::OnDrawFrame() {
         return;
     }
 
-    for (int i=0; i<3; i++) {
-        if (mTexture[i]) {
-            mTexture[i]->ActiveTexture();
-        }
-    }
-
     glBindVertexArray(mVAO);
     glDrawElements(GL_TRIANGLES, VERTEX_COUNT, GL_UNSIGNED_INT, 0);
 
