@@ -79,7 +79,7 @@ void CameraRenderer::OnDrawFrame(AHardwareBuffer *buffer, int width, int height)
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, mTexId);
 
     glBindVertexArray(mVAO);
-    glDrawElements(GL_TRIANGLES, VERTEX_COUNT, GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, VERTEX_COUNT);
 
     eglSwapBuffers(mDisplay, mEglSurface);
 }
