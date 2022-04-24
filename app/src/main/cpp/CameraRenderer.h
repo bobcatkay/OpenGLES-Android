@@ -18,7 +18,7 @@ public:
     void Release();
 
 private:
-    const GLuint VERTEX_COUNT = 6;
+    const GLuint VERTEX_COUNT = 4;
 
     Shader* pShader;
     ANativeWindow* pWindow;

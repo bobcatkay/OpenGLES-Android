@@ -59,15 +59,12 @@ std::string ReadFileFromAssets(const char* fileName) {
 void InitQuadVAO(GLuint& vao) {
     float vertices[] = {
             // positions           // texture coords
-            1.0f,  1.0f, 0.0f,     1.0f, 0.0f, // top right
-            1.0f, -1.0f, 0.0f,     1.0f, 1.0f, // bottom right
+            -1.0f,  1.0f, 0.0f,    0.0f, 0.0f,  // top left
             -1.0f, -1.0f, 0.0f,    0.0f, 1.0f, // bottom left
-            -1.0f,  1.0f, 0.0f,    0.0f, 0.0f  // top left
+            1.0f,  1.0f, 0.0f,     1.0f, 0.0f, // top right
+            1.0f, -1.0f, 0.0f,     1.0f, 1.0f // bottom right
     };
-    unsigned int indices[] = {
-            0, 1, 3, // first triangle
-            1, 2, 3  // second triangle
-    };
+
     unsigned int VBO, EBO;
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &VBO);
@@ -77,9 +74,6 @@ void InitQuadVAO(GLuint& vao) {
 
     glBindBuffer(GL_ARRAY_BUFFER, vao);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);

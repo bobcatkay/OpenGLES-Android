@@ -21,7 +21,7 @@ public:
     void OnSurfaceChanged(int surfaceWidth, int surfaceHeight);
 
 private:
-    const GLuint VERTEX_COUNT = 6;
+    const GLuint VERTEX_COUNT = 4;
 
     Shader* pShader;
     ANativeWindow* pWindow;
